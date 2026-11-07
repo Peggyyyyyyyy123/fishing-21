@@ -174,7 +174,7 @@ Before assessment submission, complete the remaining evidence:
 
 - Identify all group members and each person's branch/contribution.
 - Record the actual integration PR or merge links. Do not treat a branch push as merge evidence.
-- Preserve each student's complete chronological AI prompts and responses in that student's branch or a clearly linked repository location. The logs are **not yet organised in this project**; these design notes are not a substitute for them.
+- Preserve each student's complete chronological AI prompts and responses in that student's branch or a clearly linked repository location. The current chat export and contribution records are in [LPQ evidence](evidence/LPQ/README.md). Its manifest documents attachment coverage, cutoff and exclusions. Add any other AI sessions and later messages; design notes are not a substitute for the full logs.
 - Include the separate Class Map and design rationale, final run instructions and the required group report/declarations in the submission package.
 
 ## Development notes
@@ -187,3 +187,7 @@ Before assessment submission, complete the remaining evidence:
 - [Interface](docs/stage_1_ui.md)
 
 These notes describe successive implementation steps. Later notes extend earlier snapshots of project capability.
+
+## Personal evidence index
+
+[LPQ AI dialogue, contributions and review cases](evidence/LPQ/README.md) contains the available chronological message export, screenshot attachments, commit inventory and actual integration status. Formal group identities, remaining human acceptance and future PR/merge links still need completion.
