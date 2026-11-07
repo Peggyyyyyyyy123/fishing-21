@@ -1,0 +1,53 @@
+{
+  "chat_title": "梳理 Stage 1 架构方案",
+  "thread_id": "01a1b537-1c73-72f0-9be2-574fbdbd19cc",
+  "export_scope": "Visible user and assistant message text through evidence-organisation request; not a selected summary",
+  "cutoff_record_timestamp": "2026-11-07T12:23:19.981Z",
+  "timezone": "Asia/Shanghai",
+  "message_counts": {
+    "user": 46,
+    "assistant": 85
+  },
+  "interrupted_turn_markers": 4,
+  "source_rollout_sha256": "53f96f6c181030b874613a17690acd93241f7acc51c2ab5a34be25c48ad21933",
+  "conversation_sha256": "9386365e6111a3d8459bc779f3eb651467d9d3c2e04472cdb6f4e254d1b53438",
+  "excluded_categories": [
+    "system/developer instructions",
+    "internal reasoning",
+    "raw tool calls and tool outputs",
+    "session metadata",
+    "source planning/assignment documents",
+    "messages after cutoff"
+  ],
+  "redactions": [
+    "local user-home prefixes",
+    "WeChat account-folder identifiers"
+  ],
+  "user_screenshots_copied": [
+    {
+      "file": "attachments/codex-clipboard-f01b76b0-1454-4e12-93cc-c91ac13a6ab1.png",
+      "sha256": "9c8a59476929944f018100eeab01d8d7a415a41979477767640a329fe76b7c8a"
+    },
+    {
+      "file": "attachments/codex-clipboard-a06108b5-c6c2-4bfb-a50a-21b09064089b.png",
+      "sha256": "db6cc6ae68e4968b33ee9659b0d20dc0a1d313a2f324885829c169ac50dba12d"
+    },
+    {
+      "file": "attachments/codex-clipboard-346cb3f5-ceb8-4ec6-8d48-842c0cec0c40.png",
+      "sha256": "8790c69e270753695269aedcbe48d23131ab55db730c7ea0caaaf0dae61c8fee"
+    },
+    {
+      "file": "attachments/codex-clipboard-b0fb120d-5860-4c63-8a99-a047be058bba.png",
+      "sha256": "f47510fbfb5c271fa8fa183069f6303fe7e210327240926e1ec85ad6255ae8ce"
+    },
+    {
+      "file": "attachments/codex-clipboard-407a882e-3e79-4f7c-86ac-d43636d54b32.png",
+      "sha256": "d1e3b5ca2afa88b90c2d30604b30f13f1c290e8e2ea12722e4071bae8fd87a08"
+    }
+  ],
+  "missing_user_screenshots": [],
+  "code_head_before_evidence": "b45ade203cc3a47cd41f9d2922bcad0468f8ebc5",
+  "history_commit_count": 8,
+  "limits": "Only this chat. Source file attachments and later communications require separate preservation. This does not certify independent student authorship or complete human acceptance.",
+  "preservation_note": "Original message whitespace, including Markdown hard breaks, is retained in the conversation archive. Whitespace lint excludes that archive to preserve exported content."
+}

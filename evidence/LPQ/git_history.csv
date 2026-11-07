@@ -1,0 +1,10 @@
+commit,date,author,subject,url
+1b6cd4ad8aac232d03ad5ed081260e9164a44a9c,2026-11-07T17:31:20+08:00,Peggyyyyyyyy123,Initialize Fishing21 Godot project,https://github.com/Peggyyyyyyyy123/fishing-21/commit/1b6cd4ad8aac232d03ad5ed081260e9164a44a9c
+f884aed0c35f395986f35ca18eb0184925339f0a,2026-11-07T19:02:09+08:00,Peggyyyyyyyy123,"Implement Stage 1 foundation, initialization and casting",https://github.com/Peggyyyyyyyy123/fishing-21/commit/f884aed0c35f395986f35ca18eb0184925339f0a
+bd0243d954d602dcd20f17be7dc0b714f57e9827,2026-11-07T19:06:19+08:00,Peggyyyyyyyy123,Implement return to shore and daily settlement,https://github.com/Peggyyyyyyyy123/fishing-21/commit/bd0243d954d602dcd20f17be7dc0b714f57e9827
+50f0d5fa829e6bbab69a5a33944dc6ff3d542c0d,2026-11-07T19:11:58+08:00,Peggyyyyyyyy123,Implement day progression and final-day victory,https://github.com/Peggyyyyyyyy123/fishing-21/commit/50f0d5fa829e6bbab69a5a33944dc6ff3d542c0d
+ef894022ab4285f450b8c0345676981dd3cefb0f,2026-11-07T19:27:01+08:00,Peggyyyyyyyy123,Add playable 2D interface with English text,https://github.com/Peggyyyyyyyy123/fishing-21/commit/ef894022ab4285f450b8c0345676981dd3cefb0f
+7ced8900f35b9aaa0e096ac725327cd631e0ba7e,2026-11-07T19:33:06+08:00,Peggyyyyyyyy123,Document Stage 1 acceptance checks and verification results,https://github.com/Peggyyyyyyyy123/fishing-21/commit/7ced8900f35b9aaa0e096ac725327cd631e0ba7e
+63f59927d2e6ea896a934a8b4416384d7e4dbabb,2026-11-07T19:40:07+08:00,Peggyyyyyyyy123,Fix configuration-dependent UI and error overlay handling,https://github.com/Peggyyyyyyyy123/fishing-21/commit/63f59927d2e6ea896a934a8b4416384d7e4dbabb
+b45ade203cc3a47cd41f9d2922bcad0468f8ebc5,2026-11-07T20:19:04+08:00,Peggyyyyyyyy123,"Add project README with setup, rules and verification guide",https://github.com/Peggyyyyyyyy123/fishing-21/commit/b45ade203cc3a47cd41f9d2922bcad0468f8ebc5
+aebcd29cfebca62477b0460271a66a743b289910,2026-11-07T20:28:29+08:00,Peggyyyyyyyy123,Organize Stage 1 AI dialogue and personal contribution evidence,https://github.com/Peggyyyyyyyy123/fishing-21/commit/aebcd29cfebca62477b0460271a66a743b289910

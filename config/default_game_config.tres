@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="GameConfig" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://config/game_config.gd" id="1_config"]
+[ext_resource type="Script" path="res://config/fish_definition.gd" id="2_definition"]
+
+[sub_resource type="Resource" id="Empty"]
+script = ExtResource("2_definition")
+species_id = &"nothing"
+display_name = "No catch"
+probability = 0.2
+min_weight_kg = 0
+max_weight_kg = 0
+is_empty_catch = true
+
+[sub_resource type="Resource" id="Small"]
+script = ExtResource("2_definition")
+species_id = &"small"
+display_name = "Small fish"
+probability = 0.55
+min_weight_kg = 1
+max_weight_kg = 4
+
+[sub_resource type="Resource" id="Medium"]
+script = ExtResource("2_definition")
+species_id = &"mid"
+display_name = "Medium fish"
+probability = 0.15
+min_weight_kg = 5
+max_weight_kg = 10
+
+[sub_resource type="Resource" id="Large"]
+script = ExtResource("2_definition")
+species_id = &"big"
+display_name = "Large fish"
+probability = 0.08
+min_weight_kg = 11
+max_weight_kg = 16
+
+[sub_resource type="Resource" id="Huge"]
+script = ExtResource("2_definition")
+species_id = &"huge"
+display_name = "Huge fish"
+probability = 0.02
+min_weight_kg = 17
+max_weight_kg = 21
+
+[resource]
+script = ExtResource("1_config")
+net_slots = 5
+bait_per_day = 6
+weight_cap_kg = 21
+price_per_kg = 10
+perfect_multiplier = 2
+bust_income = 0
+daily_quotas = Array[int]([40, 50, 60, 70, 80, 90, 100])
+fish_definitions = Array[ExtResource("2_definition")]([SubResource("Empty"), SubResource("Small"), SubResource("Medium"), SubResource("Large"), SubResource("Huge")])
