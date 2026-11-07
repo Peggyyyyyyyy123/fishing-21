@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://presentation/game_controller.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/game_view.tscn" id="2"]
+[ext_resource type="Resource" path="res://config/default_game_config.tres" id="3"]
+
+[node name="Fishing21" type="Node"]
+script = ExtResource("1")
+game_config = ExtResource("3")
+
+[node name="GameView" parent="." instance=ExtResource("2")]

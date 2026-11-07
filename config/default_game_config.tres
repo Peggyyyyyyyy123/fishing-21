@@ -6,7 +6,7 @@
 [sub_resource type="Resource" id="Empty"]
 script = ExtResource("2_definition")
 species_id = &"nothing"
-display_name = "空军"
+display_name = "No catch"
 probability = 0.2
 min_weight_kg = 0
 max_weight_kg = 0
@@ -15,7 +15,7 @@ is_empty_catch = true
 [sub_resource type="Resource" id="Small"]
 script = ExtResource("2_definition")
 species_id = &"small"
-display_name = "小鱼"
+display_name = "Small fish"
 probability = 0.55
 min_weight_kg = 1
 max_weight_kg = 4
@@ -23,7 +23,7 @@ max_weight_kg = 4
 [sub_resource type="Resource" id="Medium"]
 script = ExtResource("2_definition")
 species_id = &"mid"
-display_name = "中鱼"
+display_name = "Medium fish"
 probability = 0.15
 min_weight_kg = 5
 max_weight_kg = 10
@@ -31,7 +31,7 @@ max_weight_kg = 10
 [sub_resource type="Resource" id="Large"]
 script = ExtResource("2_definition")
 species_id = &"big"
-display_name = "大鱼"
+display_name = "Large fish"
 probability = 0.08
 min_weight_kg = 11
 max_weight_kg = 16
@@ -39,7 +39,7 @@ max_weight_kg = 16
 [sub_resource type="Resource" id="Huge"]
 script = ExtResource("2_definition")
 species_id = &"huge"
-display_name = "特大鱼"
+display_name = "Huge fish"
 probability = 0.02
 min_weight_kg = 17
 max_weight_kg = 21
