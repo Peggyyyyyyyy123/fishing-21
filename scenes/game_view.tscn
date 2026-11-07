@@ -224,7 +224,7 @@ horizontal_alignment = 1
 [node name="StartButton" type="Button" parent="MenuOverlay/Center/Panel/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Start your seven-day voyage"
+text = "Start your voyage"
 
 [node name="ResultTitle" type="Label" parent="ResultOverlay/Center/Panel/Layout"]
 unique_name_in_owner = true

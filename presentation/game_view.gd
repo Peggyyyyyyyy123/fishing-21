@@ -28,6 +28,8 @@ func _ready() -> void:
 
 
 func show_menu(config: GameConfig) -> void:
+	%StartButton.text = "Start your %d-day voyage" % config.get_total_days()
+	%StartButton.disabled = false
 	%MenuRules.text = "%d bait per day. Your net holds up to %d fish.\nOver %d kg breaks the net. Exactly %d kg pays ×%d.\nCover the daily rent for %d days to win.\nKeep every catch. Choose when to return to shore." % [config.bait_per_day, config.net_slots, config.weight_cap_kg, config.weight_cap_kg, config.perfect_multiplier, config.get_total_days()]
 	_menu.show()
 	_result.hide()
@@ -113,6 +115,10 @@ func show_result(result: DayResult, session: GameSession) -> void:
 
 
 func show_error(message: String) -> void:
+	_result.hide()
+	_cast_button.disabled = true
+	_return_button.disabled = true
+	_scenery.set_casting(false)
 	%MenuRules.text = message
 	%StartButton.disabled = true
 	_menu.show()
