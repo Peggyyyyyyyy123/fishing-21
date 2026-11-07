@@ -2,6 +2,10 @@
 
 A small 2D fishing game built with Godot and GDScript for AP6412, Route A. Decide whether to cast again or return to shore: every fish must stay in the net, and exceeding 21 kg loses the day's income.
 
+## Group and responsibility
+
+Group: **Group5**. Stage 1 contributor: **Li Peiqi** (GitHub: `Peggyyyyyyyy123`, personal branch: `LPQ/featrue-stage1`). Other group members and their responsibilities must be added by the group. See [the personal contribution record](evidence/LPQ/contribution.md).
+
 ## Project status
 
 Stage 1 implements a complete seven-day game with an English interface, daily settlement, failure, victory and restart. It remains a development baseline: the `stage-1` release tag has **not** been created. Remaining manual acceptance and submission evidence must be completed before freezing it.
@@ -190,4 +194,4 @@ These notes describe successive implementation steps. Later notes extend earlier
 
 ## Personal evidence index
 
-[LPQ AI dialogue, contributions and review cases](evidence/LPQ/README.md) contains the available chronological message export, screenshot attachments, commit inventory and actual integration status. Formal group identities, remaining human acceptance and future PR/merge links still need completion.
+[LPQ AI dialogue, contributions and review cases](evidence/LPQ/README.md) contains the available chronological message export, screenshot attachments, commit inventory and actual integration status. Li Peiqi and Group5 are identified; other members, remaining human acceptance and future PR/merge links still need completion.

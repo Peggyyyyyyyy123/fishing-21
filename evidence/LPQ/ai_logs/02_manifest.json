@@ -1,0 +1,12 @@
+{
+  "student": "Li Peiqi",
+  "group": "Group5",
+  "prior_log": "01_stage1_conversation.md",
+  "supplement": "02_evidence_and_identity.md",
+  "cutoff_timestamp": "2026-11-07T12:31:07.281Z",
+  "timestamp_timezone": "UTC as recorded",
+  "supplement_sha256": "bfc99ae33e9ec8dda40a8d7910fa3188243684f9ab66da690b57be665dca03e0",
+  "screenshot": "../screenshots/commit_history.png",
+  "screenshot_sha256": "9251e0f7bf00e5321860d984d10ae8aea49d3c557b7a9eea8c0296e158d5731c",
+  "limits": "Partial screenshot is supporting evidence. No merged PR or completed manual acceptance is inferred. Reflection remains a student-review draft."
+}
