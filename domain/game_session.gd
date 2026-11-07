@@ -2,7 +2,7 @@ class_name GameSession
 extends RefCounted
 ## Owns run lifecycle, day number and coins. No scene-tree dependencies.
 
-enum State { NOT_STARTED, READY_FOR_DAY, DAY_ACTIVE, DAY_ENDED, DAY_SETTLED, GAME_OVER }
+enum State { NOT_STARTED, READY_FOR_DAY, DAY_ACTIVE, DAY_ENDED, DAY_SETTLED, GAME_OVER, VICTORY }
 
 var _state: State = State.NOT_STARTED
 var _config: GameConfig
@@ -96,9 +96,29 @@ func settle_day() -> DayResult:
 		return null
 	_last_result = result
 	_coins += result.get_coin_gain()
-	_state = State.DAY_SETTLED if result.is_passed() else State.GAME_OVER
+	if not result.is_passed():
+		_state = State.GAME_OVER
+	elif _day_number == get_total_days():
+		_state = State.VICTORY
+	else:
+		_state = State.DAY_SETTLED
 	return result.copy()
 
 
 func get_last_result() -> DayResult:
 	return null if _last_result == null else _last_result.copy()
+
+
+func can_advance_day() -> bool:
+	return _state == State.DAY_SETTLED and _day_number < get_total_days()
+
+
+func advance_day() -> bool:
+	# Advance only after a successful settlement, once per day.
+	if not can_advance_day():
+		return false
+	_day_number += 1
+	_current_day = null
+	_last_result = null
+	_state = State.READY_FOR_DAY
+	return true
