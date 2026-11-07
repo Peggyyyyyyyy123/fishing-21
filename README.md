@@ -8,7 +8,7 @@ Group: **Group5**. Stage 1 contributor: **Li Peiqi** (GitHub: `Peggyyyyyyyy123`,
 
 ## Project status
 
-Stage 1 implements a complete seven-day game with an English interface, daily settlement, failure, victory and restart. It remains a development baseline: the `stage-1` release tag has **not** been created. Remaining manual acceptance and submission evidence must be completed before freezing it.
+Stage 1 implements a complete seven-day game with an English interface, daily settlement, failure, victory and restart. The baseline is preserved by the [`stage-1` tag](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-1). See [the freeze record](docs/stage_1_release.md) for clean-source validation and limitations. Remaining manual acceptance and submission materials are still open; tagging is not a claim that all assessment work is complete.
 
 Stage 2 and Stage 3 requirements will be released by the lecturer after the preceding version is frozen. They are not implemented or assigned in advance.
 
@@ -172,7 +172,7 @@ See [the acceptance checklist](docs/stage_1_acceptance.md) for observed manual r
 - [Pull requests](https://github.com/Peggyyyyyyyy123/fishing-21/pulls)
 - [Published tags](https://github.com/Peggyyyyyyyy123/fishing-21/tags)
 
-The branch spelling above matches the repository. No frozen `stage-1` tag existed when this README was prepared. Add the exact tag and relevant merge/PR links after review, integration and a clean-checkout run; keep frozen stage tags unchanged.
+The branch spelling above matches the repository. Frozen baseline: [`stage-1`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-1). It preserves the personal-branch baseline; group PR/merge evidence must still be recorded separately. Keep this tag unchanged.
 
 Before assessment submission, complete the remaining evidence:
 

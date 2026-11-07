@@ -1,5 +1,7 @@
 # Stage 1 验收清单与记录
 
+后续状态：用户已要求冻结代码基线，见 [stage_1_release.md](stage_1_release.md)。以下为原始验收记录；未完成的人工项目仍保持待验，不因创建标签自动转为通过。
+
 验收日期：2026-11-07（Asia/Shanghai）。
 被测代码提交：`ef89402`。个人分支：`LPQ/featrue-build`。
 引擎：Godot `4.7.2.stable.mono.official.ed1daf0bf`，Windows，Compatibility 渲染。

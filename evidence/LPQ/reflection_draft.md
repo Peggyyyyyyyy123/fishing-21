@@ -2,7 +2,7 @@
 
 ## Li Peiqi Group5
 
-Review status: draft for Li Peiqi to check before submission. Please confirm that the learning statements below match your experience and understanding.
+Review status: Li Peiqi approved this text for commit and push in the recorded conversation. The existing draft filename is retained for stable links; final report submission remains the student's responsibility.
 
 My responsibility in Stage 1 was to guide the development of the Fishing21 baseline using our game plan and the assignment requirements. I provided the planning materials, requested a clear class structure and directed implementation through manageable steps, including casting, daily settlement, seven-day progression and the playable interface.
 

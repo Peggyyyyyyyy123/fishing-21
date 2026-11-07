@@ -1,0 +1,8 @@
+{
+  "previous_cutoff": "2026-11-07T12:31:07.281Z",
+  "cutoff_timestamp": "2026-11-07T12:40:49.047Z",
+  "message_count": 13,
+  "file": "03_reflection_and_freeze.md",
+  "sha256": "78bf22af5bd4b97cb0b041b7bfd0ba887bd27cc409e941812343f4acd7e2c396",
+  "limits": "Excludes internal instructions/reasoning and tool payloads. Completion of freeze and future conversations are beyond this snapshot."
+}

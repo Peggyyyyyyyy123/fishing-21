@@ -14,6 +14,8 @@ Student: **Li Peiqi**. Group: **Group5**. Student identifier: **LPQ**. GitHub id
 | [Reflection draft](reflection_draft.md) | Student review draft for the individual reflection chapter |
 | [Conversation supplement](ai_logs/02_evidence_and_identity.md) | Subsequent evidence-organisation and identity messages |
 | [Commit history screenshot](screenshots/commit_history.png) | Student-provided GitHub Desktop snapshot |
+| [Reflection and freeze dialogue](ai_logs/03_reflection_and_freeze.md) | Original later messages and reflection approval |
+| [Freeze record](../../docs/stage_1_release.md) | Frozen baseline verification and known limitations |
 | [Integration status](integration.md) | Actual branch state and links for future PR/merge evidence |
 
 This folder belongs to the personal branch `LPQ/featrue-stage1`. Source code uses GDScript. AI generated substantial implementation, tests and documentation under user direction; account attribution alone does not prove independent manual authorship or understanding.
@@ -22,6 +24,6 @@ This folder belongs to the personal branch `LPQ/featrue-stage1`. Source code use
 
 The conversation file preserves the available message text rather than selected excerpts. It does not include raw tool payloads or internal instructions/reasoning. User screenshots are retained only when their original local files remain available; see the manifest. The source planning workbook, early Class Map slides and lecturer brief are not copied into this repository. Other chats or AI tools are outside the export and must be added if used.
 
-The Class Map PPTX and design rationale DOCX are separate deliverables outside the Godot project by user request. They must accompany the final submission. Li Peiqi and Group5 are identified. A reflection draft requires student review; no signature, completed manual seven-day demonstration or merged PR is asserted here.
+The Class Map PPTX and design rationale DOCX are separate deliverables outside the Godot project by user request. They must accompany the final submission. Li Peiqi and Group5 are identified. The reflection text was approved by Li Peiqi for commit/push; no signature, completed manual seven-day demonstration or merged PR is asserted here.
 
 Future AI use must be appended as a new dated log with an explicit cutoff; preserve this snapshot. Review exports for sensitive information before any broader sharing.
