@@ -2,7 +2,7 @@ class_name FishingDay
 extends RefCounted
 ## Owns one day's runtime state. Each day starts with a fresh net.
 
-enum EndReason { NONE, BUST, NET_FULL, BAIT_EMPTY }
+enum EndReason { NONE, BUST, NET_FULL, BAIT_EMPTY, RETURNED }
 
 var _end_reason: EndReason = EndReason.NONE
 var _catch_source: CatchSource
@@ -100,3 +100,11 @@ func _update_end_reason() -> void:
 		_end_reason = EndReason.NET_FULL
 	elif _bait_remaining == 0:
 		_end_reason = EndReason.BAIT_EMPTY
+
+
+func return_to_shore() -> bool:
+	# Empty nets may return; neither returning twice nor returning mid-cast is valid.
+	if _is_resolving or is_finished():
+		return false
+	_end_reason = EndReason.RETURNED
+	return true

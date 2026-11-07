@@ -2,10 +2,12 @@ class_name GameSession
 extends RefCounted
 ## Owns run lifecycle, day number and coins. No scene-tree dependencies.
 
-enum State { NOT_STARTED, READY_FOR_DAY, DAY_ACTIVE, DAY_ENDED }
+enum State { NOT_STARTED, READY_FOR_DAY, DAY_ACTIVE, DAY_ENDED, DAY_SETTLED, GAME_OVER }
 
 var _state: State = State.NOT_STARTED
 var _config: GameConfig
+var _settlement_rules: SettlementRules
+var _last_result: DayResult
 var _day_number: int = 0
 var _coins: int = 0
 var _current_day: FishingDay
@@ -23,6 +25,13 @@ func start_new_game(config: GameConfig) -> bool:
 		return false
 	# Freeze this run's inputs; editing the source resource affects only later runs.
 	_config = config.duplicate(true) as GameConfig
+	_settlement_rules = SettlementRules.new(
+		_config.weight_cap_kg,
+		_config.price_per_kg,
+		_config.perfect_multiplier,
+		_config.bust_income,
+	)
+	_last_result = null
 	_day_number = 1
 	_coins = 0
 	_current_day = null
@@ -74,3 +83,22 @@ func get_current_day() -> FishingDay:
 
 func get_start_errors() -> PackedStringArray:
 	return _start_errors.duplicate()
+
+
+func settle_day() -> DayResult:
+	# Idempotent: repeated UI requests return a snapshot without paying twice.
+	if _last_result != null:
+		return _last_result.copy()
+	if get_state() != State.DAY_ENDED:
+		return null
+	var result := _settlement_rules.calculate(_current_day)
+	if result == null:
+		return null
+	_last_result = result
+	_coins += result.get_coin_gain()
+	_state = State.DAY_SETTLED if result.is_passed() else State.GAME_OVER
+	return result.copy()
+
+
+func get_last_result() -> DayResult:
+	return null if _last_result == null else _last_result.copy()
