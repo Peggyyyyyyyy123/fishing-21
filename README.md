@@ -1,16 +1,24 @@
 # Fishing21
 
-A small 2D fishing game built with Godot and GDScript for AP6412, Route A. Decide whether to cast again or return to shore: every fish must stay in the net, and exceeding 21 kg loses the day's income.
+A small 2D fishing game built with Godot and GDScript for AP6412, Route A. Decide whether to cast again or return to shore: every fish must stay in the net, and exceeding 21 kg loses the day's income. From Stage 2, a visible daily sea and next-cast odds turn that decision into a readable risk.
 
 ## Group and responsibility
 
-Group: **Group5**. Stage 1 contributor: **Li Peiqi** (GitHub: `Peggyyyyyyyy123`, personal branch: `LPQ/featrue-stage1`). Other group members and their responsibilities must be added by the group. See [the personal contribution record](evidence/LPQ/contribution.md).
+Group: **Group5**.
+
+| Member | GitHub | Personal branches | Main responsibility |
+| --- | --- | --- | --- |
+| Li Peiqi | `Peggyyyyyyyy123` | `LPQ/featrue-build`, `LPQ/featrue-stage1` | Stage 1 implementation, tests and freeze ([contribution record](evidence/LPQ/contribution.md)) |
+| Chin Hsien Yeh | `Lecter1007` | `YCH/stage-2` | Stage 2 design and implementation (sea report), Class Maps and change maps |
 
 ## Project status
 
-Stage 1 implements a complete seven-day game with an English interface, daily settlement, failure, victory and restart. The baseline is preserved by the [`stage-1` tag](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-1). See [the freeze record](docs/stage_1_release.md) for clean-source validation and limitations. Remaining manual acceptance and submission materials are still open; tagging is not a claim that all assessment work is complete.
+| Version | Tag | What it adds |
+| --- | --- | --- |
+| Stage 1 | [`stage-1`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-1) | Complete seven-day game: casting, forced retention, 21 kg rule, settlement, rent, failure, victory, restart. See [the freeze record](docs/stage_1_release.md) |
+| Stage 2 | [`stage-2`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-2) | Finite visible daily sea, sea report, next-cast odds, rent in kilograms. See [Stage 2 rationale](docs/design_rationale_stage_2.md) |
 
-Stage 2 and Stage 3 requirements will be released by the lecturer after the preceding version is frozen. They are not implemented or assigned in advance.
+Each tag is independently runnable. Earlier tags are never moved.
 
 ## Requirements
 
@@ -23,11 +31,12 @@ Use the tested editor version for reproducible assessment. Other Godot versions 
 
 ## Get the project and run
 
-Clone the current personal development branch:
+Clone the repository and check out the version to run (`stage-1`, `stage-2`, ...):
 
 ```powershell
-git clone --branch LPQ/featrue-stage1 https://github.com/Peggyyyyyyyy123/fishing-21.git
+git clone https://github.com/Peggyyyyyyyy123/fishing-21.git
 cd fishing-21
+git checkout stage-2
 ```
 
 This is a private repository, so access requires an authorised GitHub account.
@@ -99,25 +108,45 @@ Exactly 21 kg does not itself force a return. If bait and slots remain, casting 
 
 The source selects an outcome by probability, then chooses a weight uniformly within that outcome's inclusive integer range. Numeric defaults and display names are stored in `config/default_game_config.tres`.
 
+## Stage 2 rules: a readable sea
+
+All Stage 1 rules above still apply. Stage 2 adds information, not new ways to earn:
+
+- Each morning the sea is stocked with `sea_pool_size` outcomes (default **12**), each drawn from the distribution above. Empty casts are part of the pool.
+- The **sea report** lists each outcome with its weight range and `remaining / stocked` count. Every cast removes one outcome, so what has been caught changes the next cast's odds.
+- Exact weights stay hidden: a fish's weight is rolled within its range when it is caught.
+- **Next-cast odds** show the chance to break the net, to land exactly 21 kg, and of no catch, plus the room left. The weight bar turns amber at ≥15% break chance and red at ≥35%.
+- The rent is shown in kilograms (`rent ÷ price`, rounded up). The net header shows *rent covered* once it is reached.
+
+`sea_pool_size = 0` restores Stage 1 independent draws. Balance comparison: [Stage 2 rationale](docs/design_rationale_stage_2.md#balance-check).
+
 ## Code structure and design
 
 ```text
 config/         GameConfig and FishDefinition resources
-domain/         Catch generation, net, day, settlement and run rules
-presentation/   GameController, GameView and FishingView
+domain/         Catch generation, sea pool, odds, net, day, settlement and run rules
+presentation/   GameController, GameView, SeaReportPanel and FishingView
 scenes/         Main scene and interface scene
 tests/          Headless rule tests, actual-scene UI tests and test helpers
-docs/           Development explanations and acceptance records
+tools/          Dev helpers: balance simulation and screenshot capture
+docs/           Class Maps, design rationale, change maps, acceptance records
+docs/design/    Numeric design workbook (fishing21_config_v0.1.xlsx)
+evidence/       Per-student AI logs and contribution records
 project.godot   Editor settings and main-scene entry point
 ```
 
+Design documents:
+
+| Version | Class Map | Design rationale | Change map |
+| --- | --- | --- | --- |
+| Stage 1 | [class_map_stage_1](docs/class_map_stage_1.md) | [design_rationale_stage_1](docs/design_rationale_stage_1.md) | — |
+| Stage 2 | [class_map_stage_2](docs/class_map_stage_2.md) | [design_rationale_stage_2](docs/design_rationale_stage_2.md) | [Stage 1 → 2](docs/change_map_stage_1_to_2.md) |
+
 `GameSession` owns progression and coin payment. `FishingDay` owns casting, bait and daily end conditions. `FishingNet` stores catches. `SettlementRules` calculates a `DayResult` without paying coins itself. State guards prevent duplicate settlements and skipped days.
 
-`FishingDay` receives the small abstract `CatchSource` contract. `RandomCatchSource` supplies normal gameplay, while test-only `FixedCatchSource` supplies reproducible outcomes. Fish sizes differ through `FishDefinition` data rather than subclasses without different behaviour.
+`FishingDay` receives the small abstract `CatchSource` contract. `SeaPoolCatchSource` supplies normal gameplay (a finite daily sea). `RandomCatchSource` supplies independent draws when `sea_pool_size` is 0, and test-only `FixedCatchSource` supplies reproducible outcomes. `CatchForecast` computes next-cast odds from public information only. Fish sizes differ through `FishDefinition` data rather than subclasses without different behaviour.
 
-`GameController` connects input to the model. `GameView` displays state and results, and `FishingView` draws the scenery. Domain code has no dependency on scene nodes or buttons, although it uses Godot types such as `RefCounted` and `Resource`.
-
-The Class Map PowerPoint and short design rationale Word document are **separate deliverables outside this Godot project**. Supply them with the final submission and keep them aligned with the frozen source version.
+`GameController` connects input to the model. `GameView` displays state and results, delegates the sea report to `SeaReportPanel`, and `FishingView` draws the scenery. Domain code has no dependency on scene nodes or buttons, although it uses Godot types such as `RefCounted` and `Resource`.
 
 ## Verification
 
@@ -129,7 +158,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Godot import failed.' }
 
 $testSuites = @(
     'foundation', 'initialization', 'casting',
-    'settlement', 'progression', 'ui', 'review'
+    'settlement', 'progression', 'ui', 'review', 'sea'
 )
 foreach ($suite in $testSuites) {
     & $godot --headless --path . --script "res://tests/test_$suite.gd"
@@ -137,7 +166,7 @@ foreach ($suite in $testSuites) {
 }
 ```
 
-Recorded results for the implementation at commit `63f5992`:
+Recorded results for Stage 2. The seven Stage 1 suites are unmodified from `stage-1`:
 
 | Suite | Checks | Failures |
 | --- | ---: | ---: |
@@ -148,7 +177,8 @@ Recorded results for the implementation at commit `63f5992`:
 | Progression | 408 | 0 |
 | UI | 79 | 0 |
 | Review regressions | 12 | 0 |
-| **Total** | **688** | **0** |
+| Sea report and odds (Stage 2) | 43 | 0 |
+| **Total** | **731** | **0** |
 
 These results cover the recorded source version and do not guarantee untested changes or environments. Tests include probability boundaries, 21/22 kg limits, mandatory retention, ending priority, repeated input, settlement idempotence, all seven days, failure with savings and restart.
 
@@ -167,19 +197,21 @@ See [the acceptance checklist](docs/stage_1_acceptance.md) for observed manual r
 ## GitHub and assessment evidence
 
 - [Repository](https://github.com/Peggyyyyyyyy123/fishing-21)
-- [Current personal branch: LPQ/featrue-stage1](https://github.com/Peggyyyyyyyy123/fishing-21/tree/LPQ/featrue-stage1)
-- [Branch commit history](https://github.com/Peggyyyyyyyy123/fishing-21/commits/LPQ/featrue-stage1)
-- [Pull requests](https://github.com/Peggyyyyyyyy123/fishing-21/pulls)
-- [Published tags](https://github.com/Peggyyyyyyyy123/fishing-21/tags)
+- Personal branches: [LPQ/featrue-build](https://github.com/Peggyyyyyyyy123/fishing-21/tree/LPQ/featrue-build), [LPQ/featrue-stage1](https://github.com/Peggyyyyyyyy123/fishing-21/tree/LPQ/featrue-stage1), [YCH/stage-2](https://github.com/Peggyyyyyyyy123/fishing-21/tree/YCH/stage-2) (the `featrue` spelling matches the repository)
+- [Pull requests (open and closed)](https://github.com/Peggyyyyyyyy123/fishing-21/pulls?q=is%3Apr) · [Merge history on main](https://github.com/Peggyyyyyyyy123/fishing-21/commits/main)
+- Tags: [`stage-1`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-1), [`stage-2`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-2) · [all tags](https://github.com/Peggyyyyyyyy123/fishing-21/tags)
+- Comparison: [`stage-1...stage-2`](https://github.com/Peggyyyyyyyy123/fishing-21/compare/stage-1...stage-2)
 
-The branch spelling above matches the repository. Frozen baseline: [`stage-1`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-1). It preserves the personal-branch baseline; group PR/merge evidence must still be recorded separately. Keep this tag unchanged.
+Stage 1 was merged into `main` with a merge commit (`2b87092`). Stage 2 is integrated from `YCH/stage-2` through a pull request with a merge commit, then tagged on `main`.
 
-Before assessment submission, complete the remaining evidence:
+AI communication logs:
 
-- Identify all group members and each person's branch/contribution.
-- Record the actual integration PR or merge links. Do not treat a branch push as merge evidence.
-- Preserve each student's complete chronological AI prompts and responses in that student's branch or a clearly linked repository location. The current chat export and contribution records are in [LPQ evidence](evidence/LPQ/README.md). Its manifest documents attachment coverage, cutoff and exclusions. Add any other AI sessions and later messages; design notes are not a substitute for the full logs.
-- Include the separate Class Map and design rationale, final run instructions and the required group report/declarations in the submission package.
+| Member | Location |
+| --- | --- |
+| Li Peiqi | [evidence/LPQ](evidence/LPQ/README.md) |
+| Chin Hsien Yeh | `evidence/YCH/` (to be added by the student) |
+
+Still to complete before submission: the remaining manual acceptance items, each student's full AI logs, the group report and the declarations.
 
 ## Development notes
 
@@ -190,8 +222,8 @@ Before assessment submission, complete the remaining evidence:
 - [Progression](docs/stage_1_progression.md)
 - [Interface](docs/stage_1_ui.md)
 
-These notes describe successive implementation steps. Later notes extend earlier snapshots of project capability.
+These notes describe successive Stage 1 implementation steps. Stage 2 is documented in the design table above.
 
 ## Personal evidence index
 
-[LPQ AI dialogue, contributions and review cases](evidence/LPQ/README.md) contains the available chronological message export, screenshot attachments, commit inventory and actual integration status. Li Peiqi and Group5 are identified; other members, remaining human acceptance and future PR/merge links still need completion.
+[LPQ AI dialogue, contributions and review cases](evidence/LPQ/README.md) contains Li Peiqi's chronological message export, screenshot attachments, commit inventory and integration status for Stage 1.
