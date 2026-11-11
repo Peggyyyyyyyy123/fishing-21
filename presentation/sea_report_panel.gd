@@ -1,81 +1,86 @@
 class_name SeaReportPanel
 extends PanelContainer
-## Shows today's sea and the next-cast odds. Reads model snapshots only; no rule decisions.
+## Hover report of today's sea: each species, its weight range and remaining / stocked count.
+## Reads model snapshots only; no rule decisions.
 
-const SAFE := Color("8fd3a8")
-const WARNING := Color("f0c674")
-const DANGER := Color("f08a76")
+## Set by GameView while another overlay is open, so the report cannot pop up behind it.
+var blocked := false
 
-@onready var _title: Label = %SeaTitle
-@onready var _grid: GridContainer = %SeaGrid
-@onready var _forecast_label: Label = %ForecastLabel
-
-
-## Colour for a break chance; shared with the net weight bar so both warn together.
-static func risk_color(forecast: CatchForecast) -> Color:
-	if forecast == null:
-		return Color("d9aa6b")
-	if forecast.get_bust_chance() >= 0.35:
-		return DANGER
-	if forecast.get_bust_chance() >= 0.15:
-		return WARNING
-	return SAFE
+var _anchor: Button
+var _title: Label
+var _grid: GridContainer
 
 
-func render(day: FishingDay, config: GameConfig, forecast: CatchForecast) -> void:
-	_render_counts(day, config)
-	_render_forecast(forecast, config)
+## Builds the panel and attaches it to the button that reveals it on hover or focus.
+func build(anchor: Button, scene_owner: Node) -> void:
+	_anchor = anchor
+	# Background alpha 0.20: the report floats over the sea without hiding it.
+	add_theme_stylebox_override("panel", UiKit.box(Color(0.04, 0.12, 0.18, 0.20), 10, 20, Color(0.75, 0.87, 0.86, 0.35), 1))
+	custom_minimum_size = Vector2(530, 0)
+	var report := UiKit.column(self, 10)
+	_title = UiKit.named(UiKit.label("Today's Sea", 25), "SeaTitle", report, scene_owner)
+	_grid = UiKit.named(GridContainer.new(), "SeaGrid", report, scene_owner)
+	_grid.columns = 3
+	_grid.add_theme_constant_override("h_separation", 22)
+	_grid.add_theme_constant_override("v_separation", 6)
+	hide()
+	mouse_entered.connect(reveal)
+	mouse_exited.connect(_schedule_hide)
+	_anchor.mouse_entered.connect(reveal)
+	_anchor.mouse_exited.connect(_schedule_hide)
+	_anchor.focus_entered.connect(reveal)
+	_anchor.focus_exited.connect(_schedule_hide)
+	_anchor.pressed.connect(func(): hide() if visible else reveal())
 
 
-func _render_counts(day: FishingDay, config: GameConfig) -> void:
+func render(day: FishingDay, config: GameConfig) -> void:
 	var initial := day.get_sea_initial_counts()
 	var remaining := day.get_sea_remaining_counts()
-	var chances := day.get_next_cast_chances()
 	for child in _grid.get_children():
 		_grid.remove_child(child)
 		child.queue_free()
 	if remaining.is_empty():
-		_title.text = "Fish in these waters"
+		_title.text = "Today's Sea  ·  Species & odds"
 	else:
 		var left := 0
 		for species_id in remaining:
-			left += remaining[species_id]
-		_title.text = "Today's sea  ·  %d left" % left
+			left += int(remaining[species_id])
+		_title.text = "Today's Sea  ·  %d fish left" % left
 	for definition in config.fish_definitions:
-		var range_text := "—" if definition.is_empty_catch else "%d–%d kg" % [definition.min_weight_kg, definition.max_weight_kg]
-		var amount_text: String
+		var amount: String
 		var faded := false
 		if remaining.is_empty():
-			amount_text = "%d%%" % roundi(chances.get(definition.species_id, definition.probability) * 100.0)
+			amount = "%d%%" % roundi(definition.probability * 100)
 		else:
-			var now: int = remaining.get(definition.species_id, 0)
-			amount_text = "%d / %d" % [now, initial.get(definition.species_id, 0)]
-			faded = now == 0
-		for text in [definition.display_name, range_text, amount_text]:
-			var cell := Label.new()
-			cell.text = text
-			cell.add_theme_font_size_override("font_size", 18)
-			if faded:
-				cell.modulate = Color(1, 1, 1, 0.35)
-			_grid.add_child(cell)
+			amount = "%d / %d" % [remaining.get(definition.species_id, 0), initial.get(definition.species_id, 0)]
+			faded = int(remaining.get(definition.species_id, 0)) == 0
+		var range_text := "—" if definition.is_empty_catch else "%d–%d kg" % [definition.min_weight_kg, definition.max_weight_kg]
+		for text in [definition.display_name, range_text, amount]:
+			_grid.add_child(UiKit.label(text, 19, Color("90a5a6") if faded else UiKit.INK))
+	_reposition()
 
 
-func _render_forecast(forecast: CatchForecast, config: GameConfig) -> void:
-	if forecast == null:
-		_forecast_label.text = "Next cast  —"
-		_forecast_label.remove_theme_color_override("font_color")
+func reveal() -> void:
+	if _anchor.disabled or blocked:
 		return
-	_forecast_label.text = "Next cast  ·  Break %s  ·  Exactly %d kg %s\nRoom left %d kg  ·  No catch %s" % [
-		_percent(forecast.get_bust_chance()),
-		config.weight_cap_kg,
-		_percent(forecast.get_perfect_chance()),
-		forecast.get_room_kg(),
-		_percent(forecast.get_empty_chance()),
-	]
-	_forecast_label.add_theme_color_override("font_color", risk_color(forecast))
+	show()
+	_reposition()
 
 
-static func _percent(value: float) -> String:
-	if value > 0.0 and value < 0.01:
-		return "<1%"
-	return "%d%%" % roundi(value * 100.0)
+func _reposition() -> void:
+	var parent := get_parent() as Control
+	if parent == null or not is_instance_valid(_anchor):
+		return
+	reset_size()
+	# Sits just above the button that opened it.
+	var origin := _anchor.global_position - parent.global_position
+	position = Vector2(origin.x, maxf(8, origin.y - size.y - 12))
+
+
+func _schedule_hide() -> void:
+	await get_tree().create_timer(0.12).timeout
+	if not is_inside_tree():
+		return
+	var mouse := get_global_mouse_position()
+	if not _anchor.get_global_rect().has_point(mouse) and not get_global_rect().has_point(mouse):
+		hide()

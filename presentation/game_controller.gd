@@ -1,12 +1,15 @@
 class_name GameController
 extends Node
-## Connects input and presentation to the model; all rule decisions stay in domain classes.
+## Connects input and presentation to the model, and saves the catalogue after each catch.
+## All rule decisions stay in domain classes.
 
 @export var game_config: GameConfig
 @export_range(0.0, 2.0) var cast_delay_seconds: float = 0.45
 
 ## Optional composition hook for reproducible demonstrations/tests; empty uses normal randomness.
 var catch_source_factory: Callable
+## Replaceable so tests never touch the player's save file.
+var catalog_store := FishCatalogStore.new()
 
 var _session := GameSession.new()
 var _run_config: GameConfig
@@ -21,6 +24,14 @@ func _ready() -> void:
 	_view.return_requested.connect(_on_return)
 	_view.continue_requested.connect(_on_continue)
 	_view.restart_requested.connect(_on_restart)
+	_view.keep_requested.connect(_on_resolve_catch.bind(true))
+	_view.release_requested.connect(_on_resolve_catch.bind(false))
+	_view.bind_session(_session)
+	var catalog := catalog_store.load_catalog()
+	if catalog_store.last_error != OK:
+		_view.show_error("Could not read the field guide save. Check the save file and restart.")
+		return
+	_session.set_catalog(catalog)
 	if game_config == null or not game_config.validate().is_empty():
 		_view.show_error("Game configuration is unavailable. Check it and restart.")
 		return
@@ -52,7 +63,7 @@ func _start_day() -> void:
 	if not _session.start_day(source):
 		return
 	_view.show_game()
-	_view.set_message("A new day, a calm sea. Cast your line and try your luck.")
+	_view.set_message("A new day on the water. Choose your catches wisely.")
 	_render()
 
 
@@ -66,7 +77,22 @@ func _on_cast() -> void:
 	await get_tree().create_timer(cast_delay_seconds).timeout
 	_busy = false
 	_view.describe_catch(result, _run_config)
-	_finish_if_needed()
+	if result.get_status() == CastResult.Status.CAUGHT:
+		# The catch is already recorded in the catalogue, so save before the player chooses.
+		var saved := catalog_store.save_catalog(_session.get_catalog())
+		_view.show_catch_choice(_session, _run_config, saved != OK)
+		_render()
+	else:
+		_finish_if_needed()
+
+
+func _on_resolve_catch(keep: bool) -> void:
+	if _busy or _session.get_state() != GameSession.State.DAY_ACTIVE:
+		return
+	if _session.get_current_day().resolve_catch(keep):
+		_view.hide_catch_choice()
+		_view.set_message("Added to your net." if keep else "Released. Bait is spent; the fish leaves today's sea.")
+		_finish_if_needed()
 
 
 func _on_return() -> void:
