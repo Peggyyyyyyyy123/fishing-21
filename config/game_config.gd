@@ -5,12 +5,13 @@ extends Resource
 @export var net_slots: int = 5
 @export var bait_per_day: int = 6
 @export var weight_cap_kg: int = 21
+## Base sale price per kg for species that do not set their own price.
 @export var price_per_kg: int = 10
 @export var perfect_multiplier: int = 2
 @export var bust_income: int = 0
 ## Outcomes stocked in each day's visible sea, drawn without replacement. 0 = independent draws.
 @export var sea_pool_size: int = 12
-@export var daily_quotas: Array[int] = [40, 50, 60, 70, 80, 90, 100]
+@export var daily_quotas: Array[int] = [180, 210, 240, 250, 260, 280, 300]
 @export var fish_definitions: Array[FishDefinition] = []
 
 

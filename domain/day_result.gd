@@ -9,6 +9,7 @@ var _fish_count: int
 var _income: int
 var _quota: int
 var _perfect: bool
+var _discovery_income: int
 
 
 func _init(
@@ -19,6 +20,7 @@ func _init(
 	income: int,
 	quota: int,
 	perfect: bool,
+	discovery_income: int = 0,
 ) -> void:
 	_day_number = day_number
 	_end_reason = end_reason
@@ -27,6 +29,7 @@ func _init(
 	_income = income
 	_quota = quota
 	_perfect = perfect
+	_discovery_income = discovery_income
 
 
 func get_day_number() -> int:
@@ -43,6 +46,10 @@ func get_total_weight_kg() -> int:
 
 func get_fish_count() -> int:
 	return _fish_count
+
+
+func get_discovery_income() -> int:
+	return _discovery_income
 
 
 func get_income() -> int:
@@ -70,4 +77,4 @@ func get_coin_gain() -> int:
 
 
 func copy() -> DayResult:
-	return DayResult.new(_day_number, _end_reason, _weight_kg, _fish_count, _income, _quota, _perfect)
+	return DayResult.new(_day_number, _end_reason, _weight_kg, _fish_count, _income, _quota, _perfect, _discovery_income)

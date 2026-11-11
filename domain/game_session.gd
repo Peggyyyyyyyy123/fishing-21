@@ -1,6 +1,6 @@
 class_name GameSession
 extends RefCounted
-## Owns run lifecycle, day number and coins. No scene-tree dependencies.
+## Owns run lifecycle, day number, coins and the fish catalogue. No scene-tree dependencies.
 
 enum State { NOT_STARTED, READY_FOR_DAY, DAY_ACTIVE, DAY_ENDED, DAY_SETTLED, GAME_OVER, VICTORY }
 
@@ -12,6 +12,7 @@ var _day_number: int = 0
 var _coins: int = 0
 var _current_day: FishingDay
 var _start_errors := PackedStringArray()
+var _catalog := FishCatalog.new()  # Survives restarts: discoveries belong to the player, not one voyage.
 
 
 func start_new_game(config: GameConfig) -> bool:
@@ -26,6 +27,7 @@ func start_new_game(config: GameConfig) -> bool:
 	# Freeze this run's inputs; editing the source resource affects only later runs.
 	_config = config.duplicate(true) as GameConfig
 	_settlement_rules = SettlementRules.new(
+		_config.fish_definitions,
 		_config.weight_cap_kg,
 		_config.price_per_kg,
 		_config.perfect_multiplier,
@@ -53,6 +55,7 @@ func start_day(catch_source: CatchSource = null) -> bool:
 		_config.net_slots,
 		_config.weight_cap_kg,
 		source,
+		_catalog,
 	)
 	_state = State.DAY_ACTIVE
 	return true
@@ -89,16 +92,24 @@ func get_current_day() -> FishingDay:
 	return _current_day
 
 
-## Odds of the next cast during an active day; null when unknown or no cast is pending.
-func get_next_cast_forecast() -> CatchForecast:
-	if get_state() != State.DAY_ACTIVE or not _current_day.can_cast():
-		return null
-	return CatchForecast.calculate(
-		_config.fish_definitions,
-		_current_day.get_next_cast_chances(),
-		_current_day.get_total_weight_kg(),
-		_config.weight_cap_kg,
-	)
+## Replaces the catalogue, e.g. after loading a save. The session keeps its own copy.
+func set_catalog(catalog: FishCatalog) -> void:
+	_catalog = FishCatalog.new() if catalog == null else catalog.copy()
+
+
+## Read-only snapshot for display and saving.
+func get_catalog() -> FishCatalog:
+	return _catalog.copy()
+
+
+## Today's income if the day ended now, by the same rules as settlement.
+func preview_income() -> int:
+	return 0 if _settlement_rules == null else _settlement_rules.preview_income(_current_day)
+
+
+## Sale value of one fish at its species price, before any multiplier.
+func get_fish_value(fish: Fish) -> int:
+	return 0 if _settlement_rules == null else _settlement_rules.get_fish_value(fish)
 
 
 func get_start_errors() -> PackedStringArray:
