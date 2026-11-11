@@ -19,7 +19,7 @@ func _draw() -> void:
 	var horizon := size.y * 0.36
 	draw_rect(Rect2(Vector2.ZERO, size), Color("102c41"))
 	draw_rect(Rect2(0, horizon, size.x, size.y - horizon), Color("123e50"))
-	draw_circle(Vector2(size.x * 0.74, horizon - 35), 48, Color("e7b87c"))
+	draw_circle(Vector2(size.x * 0.56, horizon - 45), 48, Color("e7b87c"))
 	for index in range(12):
 		var y := horizon + 28 + index * 26
 		var x := fmod(index * 139.0 + _time * 9.0, maxf(size.x, 1.0))
