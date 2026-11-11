@@ -29,6 +29,9 @@ func _run() -> void:
 		await create_timer(0.2).timeout
 		await _settle()
 		_save(out_dir + "/%d_cast.png" % (index + 2))
+		var release := controller.get_node("GameView/%ReleaseButton") as Button
+		if release.is_visible_in_tree():
+			release.pressed.emit()
 	quit(0)
 
 
