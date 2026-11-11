@@ -10,7 +10,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var config := load("res://config/default_game_config.tres") as GameConfig
+	var config := LegacyTestConfig.make()
 	_test_config(config)
 	_test_pool(config)
 	_test_forecast(config)
@@ -90,45 +90,47 @@ func _test_session(config: GameConfig) -> void:
 	var day := session.get_current_day()
 	_check(not day.get_sea_remaining_counts().is_empty(), "Default day uses a finite sea")
 	var before := _sum(day.get_sea_remaining_counts())
-	_check(session.get_next_cast_forecast() != null, "Active day has a forecast")
-	day.cast()
-	if not day.is_finished():
-		_check(_sum(day.get_sea_remaining_counts()) == before - 1, "Each cast removes one outcome")
-	if not day.is_finished():
-		day.return_to_shore()
-	_check(session.get_next_cast_forecast() == null, "Finished day has no forecast")
+	var result := day.cast()
+	if result.get_status() == CastResult.Status.CAUGHT:
+		day.resolve_catch(false)
+	_check(_sum(day.get_sea_remaining_counts()) == before - 1, "Each cast removes one outcome, kept or released")
 	var legacy := config.duplicate(true) as GameConfig
 	legacy.sea_pool_size = 0
 	session = GameSession.new()
 	session.start_new_game(legacy)
 	session.start_day()
 	_check(session.get_current_day().get_sea_remaining_counts().is_empty(), "Zero sea size keeps independent draws")
-	_check(session.get_next_cast_forecast() != null, "Independent draws still show odds")
+	_check(not session.get_current_day().get_next_cast_chances().is_empty(), "Independent draws still report odds")
 
 
 func _test_ui() -> void:
+	var save := "res://tests/.sea_catalog.cfg"
 	var controller := load("res://scenes/main.tscn").instantiate() as GameController
 	controller.cast_delay_seconds = 0.001
+	controller.game_config = LegacyTestConfig.make()
+	controller.catalog_store = FishCatalogStore.new(save)
 	var config := controller.game_config
 	controller.catch_source_factory = func() -> CatchSource:
 		return SeaPoolCatchSource.new(config, null, {&"small": 5, &"huge": 1})
 	root.add_child(controller)
 	await process_frame
 	var view := controller.get_node("GameView") as GameView
+	var report := view.get_node("%SeaPanel") as SeaReportPanel
 	_check(view.get_node("%MenuRules").text.contains("sea report"), "Menu explains the sea report")
 	(view.get_node("%StartButton") as Button).pressed.emit()
-	_check(view.get_node("%QuotaLabel").text.contains("≥ 4 kg"), "Rent shown as kilograms")
-	_check(view.get_node("%SeaTitle").text.contains("6 left"), "Sea title shows remaining outcomes")
+	_check(view.get_node("%ReturnButton").text.contains("Pay 40 gold"), "Rent shown on Return")
+	_check(view.get_node("%SeaTitle").text.contains("6 fish left"), "Sea title shows remaining outcomes")
 	var grid := view.get_node("%SeaGrid") as GridContainer
 	_check(grid.get_child_count() == config.fish_definitions.size() * 3, "One report row per outcome")
 	_check(_grid_has(grid, "5 / 5") and _grid_has(grid, "17–21 kg"), "Report shows counts and weight ranges")
-	_check(view.get_node("%ForecastLabel").text.contains("Break 0%"), "Empty net shows no break risk")
+	_check(view.get_node_or_null("%ForecastLabel") == null, "Next-cast sentence removed in Stage 3")
 	(view.get_node("%CastButton") as Button).pressed.emit()
-	_check(view.get_node("%ForecastLabel").text == "Next cast  —", "Forecast hidden while casting")
+	_check(not report.visible, "Sea report hidden while casting")
 	await create_timer(0.03).timeout
-	_check(view.get_node("%SeaTitle").text.contains("5 left"), "Report updates after a cast")
+	_check(view.get_node("%SeaTitle").text.contains("5 fish left"), "Report updates after a cast")
 	controller.queue_free()
 	await process_frame
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(save))
 
 
 func _grid_has(grid: GridContainer, text: String) -> bool:

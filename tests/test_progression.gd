@@ -15,7 +15,7 @@ func _initialize() -> void:
 
 
 func _config() -> GameConfig:
-	return load("res://config/default_game_config.tres") as GameConfig
+	return LegacyTestConfig.make()
 
 
 func _start_and_catch(session: GameSession, weights: Array[int]) -> FishingDay:
@@ -26,7 +26,7 @@ func _start_and_catch(session: GameSession, weights: Array[int]) -> FishingDay:
 	var day := session.get_current_day()
 	_check(day.get_bait_remaining() == 6 and day.get_fish_count() == 0 and day.get_total_weight_kg() == 0, "Each day starts with fresh bait and net")
 	for weight in weights:
-		_check(day.cast().was_accepted(), "Scheduled cast accepted")
+		_check(KeepEveryCatch.cast(day).was_accepted(), "Scheduled cast accepted")
 	return day
 
 
@@ -51,7 +51,7 @@ func _test_seven_day_victory() -> void:
 		_check(day != previous_day, "Day object is not reused")
 		_check(day.get_quota() == 40 + index * 10, "Correct quota for each day")
 		if previous_day != null:
-			_check(not previous_day.cast().was_accepted(), "Old day stays closed")
+			_check(not KeepEveryCatch.cast(previous_day).was_accepted(), "Old day stays closed")
 			_check(previous_result.get_day_number() == index, "Previous result snapshot remains stable")
 		_finish(day)
 		var result := session.settle_day()
@@ -73,7 +73,7 @@ func _test_seven_day_victory() -> void:
 	_check(session.get_coins() == 520, "Mixed seven-day scenario accumulates 520 coins")
 	_check(not session.can_advance_day() and not session.advance_day() and not session.start_day(), "Victory has no eighth day")
 	_check(session.get_day_number() == 7 and session.get_last_result().get_day_number() == 7, "Victory preserves final day and result")
-	_check(not session.get_current_day().cast().was_accepted(), "Victory day cannot cast")
+	_check(not KeepEveryCatch.cast(session.get_current_day()).was_accepted(), "Victory day cannot cast")
 	_check(session.start_new_game(_config()), "Can restart after victory")
 	_check(session.get_state() == GameSession.State.READY_FOR_DAY and session.get_day_number() == 1, "Victory restart returns to first day")
 	_check(session.get_coins() == 0 and session.get_current_day() == null and session.get_last_result() == null, "Victory restart clears completed run state")
