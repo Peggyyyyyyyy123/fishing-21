@@ -53,6 +53,7 @@ func bind_session(session: GameSession) -> void:
 
 func show_menu(config: GameConfig) -> void:
 	_config = config
+	%MenuSubtitle.text = "FISHING 21  /  A %d-DAY VOYAGE" % config.get_total_days()
 	%StartButton.text = "Start your %d-day voyage" % config.get_total_days()
 	%StartButton.disabled = false
 	%MenuRules.text = "%d bait per day. A net with %d slots and a %d kg limit.\nEvery cast catches a fish. Keep it or release it.\nExactly %d kg doubles fish-sale income.\nDiscover new species for a gold reward, once per voyage.\nCover the daily rent for %d days to win." % [config.bait_per_day, config.net_slots, config.weight_cap_kg, config.weight_cap_kg, config.get_total_days()]
@@ -227,7 +228,7 @@ func _build_hud() -> void:
 	slots.custom_minimum_size.y = 72
 	var actions := UiKit.row(layout, 18)
 	_cast_button = UiKit.named(UiKit.button("Cast · Bait 6 / 6"), "CastButton", actions, self)
-	_return_button = UiKit.named(UiKit.button("Return · Pay 180 gold"), "ReturnButton", actions, self)
+	_return_button = UiKit.named(UiKit.button("Return"), "ReturnButton", actions, self)
 	_guide_button = UiKit.named(UiKit.button("Field Guide"), "CatalogButton", actions, self)
 	for item in [_cast_button, _return_button]:
 		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -248,7 +249,7 @@ func _build_menu_and_result() -> void:
 	var menu_panel := UiKit.panel(UiKit.centered(_menu), UiKit.DARK, 16, 36)
 	menu_panel.custom_minimum_size.x = 760
 	var menu_layout := UiKit.column(menu_panel, 22)
-	menu_layout.add_child(_centered_label("FISHING 21  /  A SEVEN-DAY VOYAGE", 18, Color("9ec9c6")))
+	UiKit.named(_centered_label("FISHING 21", 18, Color("9ec9c6")), "MenuSubtitle", menu_layout, self)
 	menu_layout.add_child(_centered_label("Every catch is a choice.", 48))
 	UiKit.named(_centered_label("", 23), "MenuRules", menu_layout, self)
 	UiKit.named(UiKit.button("Start your voyage"), "StartButton", menu_layout, self).pressed.connect(func(): start_requested.emit())

@@ -24,7 +24,7 @@ func verify_english(node: Node) -> void:
 func run() -> void:
 	var c := load("res://config/default_game_config.tres") as GameConfig
 	check(ProjectSettings.get_setting("display/window/size/mode") == 3, "Fullscreen startup configured")
-	check(c.daily_quotas.slice(0,3) == [180,210,240], "Rent remains unchanged")
+	check(c.daily_quotas == [60,180,280], "Three-day rent curve")
 	var controller := load("res://scenes/main.tscn").instantiate() as GameController
 	controller.cast_delay_seconds = 0.01
 	controller.catch_source_factory = func() -> CatchSource: return FixedCatchSource.new([Fish.new(&"sardine", 3), Fish.new(&"golden_tuna", 21)])
@@ -41,7 +41,7 @@ func run() -> void:
 	guide.close()
 	(view.get_node("%StartButton") as Button).pressed.emit()
 	await process_frame
-	check(view.get_node("%DayLabel").text == "Day 1 / 7", "Day label shows current and total days")
+	check(view.get_node("%DayLabel").text == "Day 1 / 3", "Day label shows current and total days")
 	check(view.get_node("%QuotaLabel").text == "Today: 0 gold", "Large right daily earnings")
 	check((view.get_node("%EarningsCoin") as TextureRect).texture != null, "Income has a coin icon")
 	var return_button := view.get_node("%ReturnButton") as Button
@@ -52,7 +52,7 @@ func run() -> void:
 	check(cast_color != guide_color and cast_color != GameView.RETURN_GREY and guide_color != GameView.RETURN_GREY, "Three action buttons have distinct colours")
 	check(view.get_node("%DayLabel").get_theme_font_size("font_size") >= 48, "Day typography enlarged")
 	check(view.get_node("%CastButton").text.contains("Bait 6 / 6"), "Bait moved to Cast")
-	check(view.get_node("%ReturnButton").text.contains("Pay 180 gold"), "Rent moved to Return")
+	check(view.get_node("%ReturnButton").text.contains("Pay 60 gold"), "Rent moved to Return")
 	check(view.get_node_or_null("%ForecastLabel") == null, "Forecast sentence removed entirely")
 	check(not (view.get_node("%SeaPanel") as SeaReportPanel).visible, "Sea report hidden by default")
 	(view.get_node("%SeaButton") as Button).mouse_entered.emit()
@@ -101,7 +101,7 @@ func run() -> void:
 	guide.close()
 	(view.get_node("%ContinueButton") as Button).pressed.emit()
 	await process_frame
-	check(view.get_node("%DayLabel").text == "Day 2 / 7", "Day label advances with the voyage")
+	check(view.get_node("%DayLabel").text == "Day 2 / 3", "Day label advances with the voyage")
 	(view.get_node("%CastButton") as Button).pressed.emit()
 	await create_timer(0.06).timeout
 	check(not view.get_node("%NewCatchLabel").visible, "Same voyage: sardine is no longer new")
@@ -110,7 +110,7 @@ func run() -> void:
 	check(session.get_state() == GameSession.State.GAME_OVER, "30 gold misses the Day 2 rent")
 	(view.get_node("%RestartButton") as Button).pressed.emit()
 	await process_frame
-	check(view.get_node("%DayLabel").text == "Day 1 / 7", "New voyage returns to Day 1 of 7")
+	check(view.get_node("%DayLabel").text == "Day 1 / 3", "New voyage returns to Day 1 of 3")
 	check(session.get_catalog().get_discovered_count() == 0, "New voyage resets the field guide")
 	check((return_button.get_theme_stylebox("normal") as StyleBoxFlat).bg_color == GameView.RETURN_GREY, "New voyage restores grey return")
 	view.open_field_guide()

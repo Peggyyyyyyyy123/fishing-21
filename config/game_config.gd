@@ -11,7 +11,7 @@ extends Resource
 @export var bust_income: int = 0
 ## Outcomes stocked in each day's visible sea, drawn without replacement. 0 = independent draws.
 @export var sea_pool_size: int = 12
-@export var daily_quotas: Array[int] = [180, 210, 240, 250, 260, 280, 300]
+@export var daily_quotas: Array[int] = [60, 180, 280]
 @export var fish_definitions: Array[FishDefinition] = []
 
 

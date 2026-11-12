@@ -23,7 +23,7 @@ func _run() -> void:
 	_button("StartButton").pressed.emit()
 	var session := _controller.get_session()
 	_check(session.get_day_number() == 1 and not _view.get_node("%MenuOverlay").visible, "Start button creates one first day")
-	for number in range(1, 8):
+	for number in range(1, 4):
 		_check(not _button("CastButton").disabled, "Cast enabled for active day")
 		_button("CastButton").pressed.emit()
 		_button("CastButton").pressed.emit()
@@ -38,12 +38,12 @@ func _run() -> void:
 		_check(_view.get_node("%ResultOverlay").visible, "Return opens settlement overlay")
 		_check(_button("CastButton").disabled and _button("ReturnButton").disabled, "Settlement locks gameplay")
 		_check(session.get_last_result().get_income() == 420, "UI settles perfect income")
-		if number < 7:
+		if number < 3:
 			_check(_button("ContinueButton").visible, "Continue shown before final day")
 			_button("ContinueButton").pressed.emit()
 			_button("ContinueButton").pressed.emit()
 			_check(session.get_day_number() == number + 1 and not _view.get_node("%ResultOverlay").visible, "Continue advances exactly once")
-	_check(session.get_state() == GameSession.State.VICTORY, "Seven-day UI path wins")
+	_check(session.get_state() == GameSession.State.VICTORY, "Three-day UI path wins")
 	_check(not _button("ContinueButton").visible, "Victory hides continue")
 	_check(_view.get_node("%ResultTitle").text.contains("Victory"), "Victory heading visible")
 	_controller.catch_source_factory = func() -> CatchSource: return FixedCatchSource.new([Fish.new(&"big", 12), Fish.new(&"mid", 10)])

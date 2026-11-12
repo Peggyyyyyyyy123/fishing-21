@@ -17,6 +17,7 @@ func _run() -> void:
 	await process_frame
 	var view := controller.get_node("GameView") as GameView
 	var start := view.get_node("%StartButton") as Button
+	_check(view.get_node("%MenuSubtitle").text == "FISHING 21  /  A 2-DAY VOYAGE", "Menu title follows configured run length")
 	_check(start.text == "Start your 2-day voyage", "Start label follows configured run length")
 	_check(view.get_node("%MenuRules").text.contains("2 days"), "Rules and start label agree")
 	start.pressed.emit()

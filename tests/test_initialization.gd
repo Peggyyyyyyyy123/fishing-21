@@ -28,11 +28,11 @@ func _test_start_lifecycle(config: GameConfig) -> void:
 	_check(session.start_new_game(config), "Start new game succeeds")
 	_check(session.get_state() == GameSession.State.READY_FOR_DAY, "New game waits for day start")
 	_check(session.get_day_number() == 1 and session.get_coins() == 0, "New game starts at day one with zero coins")
-	_check(session.get_total_days() == 7 and session.get_current_day() == null, "Seven-day run has no day object until started")
+	_check(session.get_total_days() == 3 and session.get_current_day() == null, "Three-day run has no day object until started")
 	_check(session.start_day(), "First day starts")
 	var first_day := session.get_current_day()
 	_check(session.get_state() == GameSession.State.DAY_ACTIVE, "Day is active")
-	_check(first_day.get_day_number() == 1 and first_day.get_quota() == 180, "First day uses first quota")
+	_check(first_day.get_day_number() == 1 and first_day.get_quota() == 60, "First day uses first quota")
 	_check(first_day.get_bait_remaining() == 6, "Day begins with six bait")
 	_check(first_day.get_fish_count() == 0 and first_day.get_total_weight_kg() == 0, "Day begins with empty net")
 	_check(not session.start_day(), "Duplicate day-start request rejected")
@@ -64,7 +64,7 @@ func _test_rejected_configuration(config: GameConfig) -> void:
 	_check(not session.start_new_game(invalid), "Invalid restart rejected")
 	_check(session.get_current_day() == active_day, "Invalid restart preserves current day")
 	_check(session.get_state() == GameSession.State.DAY_ACTIVE and session.get_day_number() == 1, "Invalid restart preserves lifecycle")
-	_check(session.get_total_days() == 7 and session.get_coins() == 0, "Invalid restart preserves run data")
+	_check(session.get_total_days() == 3 and session.get_coins() == 0, "Invalid restart preserves run data")
 
 
 func _test_run_isolation(config: GameConfig) -> void:
@@ -83,7 +83,7 @@ func _test_run_isolation(config: GameConfig) -> void:
 	_check(second.start_new_game(custom) and second.start_day(), "Separate run uses updated configuration")
 	_check(second.get_current_day().get_bait_remaining() == 9 and second.get_current_day().get_quota() == 99, "New run sees updated values")
 	_check(first.get_current_day() != second.get_current_day(), "Sessions do not share day state")
-	_check(config.bait_per_day == 6 and config.daily_quotas[0] == 180, "Default resource remains unchanged")
+	_check(config.bait_per_day == 6 and config.daily_quotas[0] == 60, "Default resource remains unchanged")
 
 
 func _test_day_initialization() -> void:
