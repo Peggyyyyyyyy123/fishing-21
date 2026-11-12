@@ -12,7 +12,9 @@ signal keep_requested
 signal release_requested
 
 const RETURN_GREY := Color("626c75")
+const RETURN_GOLD := Color("d7ab4c")
 
+var _rent_covered: bool = false
 var _session: GameSession
 var _config: GameConfig
 var _scenery: FishingView
@@ -73,6 +75,10 @@ func render(session: GameSession, config: GameConfig, busy: bool) -> void:
 	var earned := session.preview_income()
 	%DayLabel.text = "Day %d / %d" % [session.get_day_number(), session.get_total_days()]
 	%QuotaLabel.text = "%d gold" % earned
+	var rent_covered := earned >= day.get_quota()
+	if rent_covered != _rent_covered:
+		_rent_covered = rent_covered
+		UiKit.style_action(_return_button, RETURN_GOLD if rent_covered else RETURN_GREY, Color("192c37") if rent_covered else UiKit.INK)
 	_cast_button.text = "Cast · Bait %d / %d" % [day.get_bait_remaining(), config.bait_per_day]
 	_return_button.text = "Return · Pay %d gold" % day.get_quota()
 	%WeightLabel.text = "Net weight  %d / %d kg" % [day.get_total_weight_kg(), config.weight_cap_kg]

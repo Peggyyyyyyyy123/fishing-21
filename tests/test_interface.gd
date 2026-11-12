@@ -93,6 +93,7 @@ func run() -> void:
 	(view.get_node("%KeepButton") as Button).pressed.emit()
 	(view.get_node("%ReturnButton") as Button).pressed.emit()
 	check(view.get_node("%QuotaLabel").text == "873 gold", "Header: 840 doubled sale + 30 + 3 discovery")
+	check((return_button.get_theme_stylebox("normal") as StyleBoxFlat).bg_color == GameView.RETURN_GOLD, "Return turns gold once rent is covered")
 	view.open_field_guide()
 	(view.get_node("%CatalogGrid").get_child(9) as Button).pressed.emit()
 	check(view.get_node("%CatalogFishName").text == "GOLDEN TUNA" and view.get_node("%CatalogFishStats").text.contains("21000 g"), "Right-page selection updates left page")
@@ -111,6 +112,7 @@ func run() -> void:
 	await process_frame
 	check(view.get_node("%DayLabel").text == "Day 1 / 7", "New voyage returns to Day 1 of 7")
 	check(session.get_catalog().get_discovered_count() == 0, "New voyage resets the field guide")
+	check((return_button.get_theme_stylebox("normal") as StyleBoxFlat).bg_color == GameView.RETURN_GREY, "New voyage restores grey return")
 	view.open_field_guide()
 	check(view.get_node("%CatalogDetails").text.contains("Collected 0 / 10"), "Field guide view is empty again")
 	guide.close()
