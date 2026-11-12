@@ -12,7 +12,6 @@ func snap(name: String) -> void:
 
 func run() -> void:
 	var controller := load("res://scenes/main.tscn").instantiate() as GameController
-	controller.catalog_store = FishCatalogStore.new("res://tools/.preview_catalog.cfg")
 	controller.cast_delay_seconds = 0.01
 	controller.catch_source_factory = func() -> CatchSource: return FixedCatchSource.new([Fish.new(&"gold_butterflyfish", 3), Fish.new(&"golden_tuna", 21)])
 	root.add_child(controller)
@@ -31,7 +30,6 @@ func run() -> void:
 	(view.get_node("%CastButton") as Button).pressed.emit()
 	await create_timer(0.1).timeout
 	await snap("choice_overflow")
-	DirAccess.remove_absolute(ProjectSettings.globalize_path("res://tools/.preview_catalog.cfg"))
 	controller.queue_free()
 	await process_frame
 	quit()

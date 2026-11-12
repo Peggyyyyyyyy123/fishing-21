@@ -1,6 +1,6 @@
 class_name GameController
 extends Node
-## Connects input and presentation to the model, and saves the catalogue after each catch.
+## Connects input and presentation to the model.
 ## All rule decisions stay in domain classes.
 
 @export var game_config: GameConfig
@@ -8,8 +8,6 @@ extends Node
 
 ## Optional composition hook for reproducible demonstrations/tests; empty uses normal randomness.
 var catch_source_factory: Callable
-## Replaceable so tests never touch the player's save file.
-var catalog_store := FishCatalogStore.new()
 
 var _session := GameSession.new()
 var _run_config: GameConfig
@@ -27,11 +25,6 @@ func _ready() -> void:
 	_view.keep_requested.connect(_on_resolve_catch.bind(true))
 	_view.release_requested.connect(_on_resolve_catch.bind(false))
 	_view.bind_session(_session)
-	var catalog := catalog_store.load_catalog()
-	if catalog_store.last_error != OK:
-		_view.show_error("Could not read the field guide save. Check the save file and restart.")
-		return
-	_session.set_catalog(catalog)
 	if game_config == null or not game_config.validate().is_empty():
 		_view.show_error("Game configuration is unavailable. Check it and restart.")
 		return
@@ -78,9 +71,7 @@ func _on_cast() -> void:
 	_busy = false
 	_view.describe_catch(result, _run_config)
 	if result.get_status() == CastResult.Status.CAUGHT:
-		# The catch is already recorded in the catalogue, so save before the player chooses.
-		var saved := catalog_store.save_catalog(_session.get_catalog())
-		_view.show_catch_choice(_session, _run_config, saved != OK)
+		_view.show_catch_choice(_session, _run_config)
 		_render()
 	else:
 		_finish_if_needed()

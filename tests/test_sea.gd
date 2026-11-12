@@ -104,11 +104,9 @@ func _test_session(config: GameConfig) -> void:
 
 
 func _test_ui() -> void:
-	var save := "res://tests/.sea_catalog.cfg"
 	var controller := load("res://scenes/main.tscn").instantiate() as GameController
 	controller.cast_delay_seconds = 0.001
 	controller.game_config = LegacyTestConfig.make()
-	controller.catalog_store = FishCatalogStore.new(save)
 	var config := controller.game_config
 	controller.catch_source_factory = func() -> CatchSource:
 		return SeaPoolCatchSource.new(config, null, {&"small": 5, &"huge": 1})
@@ -130,7 +128,6 @@ func _test_ui() -> void:
 	_check(view.get_node("%SeaTitle").text.contains("5 fish left"), "Report updates after a cast")
 	controller.queue_free()
 	await process_frame
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(save))
 
 
 func _grid_has(grid: GridContainer, text: String) -> bool:

@@ -13,7 +13,6 @@ func _run() -> void:
 	var config := controller.game_config.duplicate(true) as GameConfig
 	config.daily_quotas = [40, 50]
 	controller.game_config = config
-	controller.catalog_store = FishCatalogStore.new("res://tests/.review_catalog.cfg")
 	root.add_child(controller)
 	await process_frame
 	var view := controller.get_node("GameView") as GameView
@@ -36,7 +35,6 @@ func _run() -> void:
 	await process_frame
 	# Errors can also be displayed during active gameplay; their overlay must lock it.
 	controller = load("res://scenes/main.tscn").instantiate() as GameController
-	controller.catalog_store = FishCatalogStore.new("res://tests/.review_catalog.cfg")
 	root.add_child(controller)
 	await process_frame
 	view = controller.get_node("GameView") as GameView

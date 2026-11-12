@@ -126,7 +126,7 @@ func _build_collection_page(pages: Node, scene_owner: Node) -> void:
 	_grid.columns = 4
 	_grid.add_theme_constant_override("h_separation", 10)
 	_grid.add_theme_constant_override("v_separation", 10)
-	collection.add_child(UiKit.label("Catch a species to add it to your guide.\nReleased fish count, too.\nDiscovery rewards are paid once per save.", 17, Color("8a7958")))
+	collection.add_child(UiKit.label("Catch a species to add it to your guide.\nReleased fish count, too.\nA new voyage starts a fresh guide.", 17, Color("8a7958")))
 
 
 func _make_tile(definition: FishDefinition, found: bool, group: ButtonGroup) -> Button:
