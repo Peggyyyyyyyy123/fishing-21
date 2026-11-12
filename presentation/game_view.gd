@@ -74,7 +74,7 @@ func render(session: GameSession, config: GameConfig, busy: bool) -> void:
 	_config = config
 	var earned := session.preview_income()
 	%DayLabel.text = "Day %d / %d" % [session.get_day_number(), session.get_total_days()]
-	%QuotaLabel.text = "%d gold" % earned
+	%QuotaLabel.text = "Today: %d gold" % earned
 	var rent_covered := earned >= day.get_quota()
 	if rent_covered != _rent_covered:
 		_rent_covered = rent_covered
@@ -205,7 +205,7 @@ func _build_hud() -> void:
 	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coin.tooltip_text = "Today's income"
-	UiKit.named(UiKit.label("0 gold", 48), "QuotaLabel", earnings, self)
+	UiKit.named(UiKit.label("Today: 0 gold", 48), "QuotaLabel", earnings, self)
 	UiKit.space(layout)
 	var tools := UiKit.row(layout)
 	_sea_button = UiKit.named(UiKit.button("Today's Sea"), "SeaButton", tools, self)

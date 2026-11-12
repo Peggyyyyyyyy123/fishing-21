@@ -42,7 +42,7 @@ func run() -> void:
 	(view.get_node("%StartButton") as Button).pressed.emit()
 	await process_frame
 	check(view.get_node("%DayLabel").text == "Day 1 / 7", "Day label shows current and total days")
-	check(view.get_node("%QuotaLabel").text == "0 gold", "Large right daily earnings")
+	check(view.get_node("%QuotaLabel").text == "Today: 0 gold", "Large right daily earnings")
 	check((view.get_node("%EarningsCoin") as TextureRect).texture != null, "Income has a coin icon")
 	var return_button := view.get_node("%ReturnButton") as Button
 	check((return_button.get_theme_stylebox("normal") as StyleBoxFlat).bg_color == GameView.RETURN_GREY, "Return is grey below rent")
@@ -79,7 +79,7 @@ func run() -> void:
 	check(view.get_node("%CastButton").text.contains("Bait 5 / 6"), "Bait count updates after release")
 	var catalog := session.get_catalog()
 	check(catalog.get_catch_count(&"sardine") == 1 and catalog.get_best_weight_kg(&"sardine") == 3, "Released fish contributes to catalogue catch record")
-	check(session.get_current_day().get_discoveries().size() == 1 and view.get_node("%QuotaLabel").text == "3 gold", "Released discovery still pays its reward")
+	check(session.get_current_day().get_discoveries().size() == 1 and view.get_node("%QuotaLabel").text == "Today: 3 gold", "Released discovery still pays its reward")
 	view.open_field_guide()
 	(view.get_node("%FieldGuide") as FieldGuideBook).select(&"sardine")
 	check(view.get_node("%CatalogFishStats").text.contains("3000 g"), "Left page displays grams")
@@ -92,7 +92,7 @@ func run() -> void:
 	check(view.get_node("%CatchChoiceDetails").text == "GOLDEN TUNA", "Second card updates species")
 	(view.get_node("%KeepButton") as Button).pressed.emit()
 	(view.get_node("%ReturnButton") as Button).pressed.emit()
-	check(view.get_node("%QuotaLabel").text == "873 gold", "Header: 840 doubled sale + 30 + 3 discovery")
+	check(view.get_node("%QuotaLabel").text == "Today: 873 gold", "Header: 840 doubled sale + 30 + 3 discovery")
 	check((return_button.get_theme_stylebox("normal") as StyleBoxFlat).bg_color == GameView.RETURN_GOLD, "Return turns gold once rent is covered")
 	view.open_field_guide()
 	(view.get_node("%CatalogGrid").get_child(9) as Button).pressed.emit()
