@@ -79,9 +79,14 @@ func render(session: GameSession, config: GameConfig, busy: bool) -> void:
 	var rent_covered := earned >= day.get_quota()
 	if rent_covered != _rent_covered:
 		_rent_covered = rent_covered
-		UiKit.style_action(_return_button, RETURN_GOLD if rent_covered else RETURN_GREY, Color("192c37") if rent_covered else UiKit.INK)
+		_style_return_button(rent_covered)
 	_cast_button.text = "Cast · Bait %d / %d" % [day.get_bait_remaining(), config.bait_per_day]
 	_return_button.text = "Return · Pay %d gold" % day.get_quota()
+	_return_button.tooltip_text = ""
+	if not rent_covered:
+		var shortfall := day.get_quota() - earned
+		_return_button.text += " · Need %d more" % shortfall
+		_return_button.tooltip_text = "You can still return now, but today's income is %d gold short of rent." % shortfall
 	%WeightLabel.text = "Net weight  %d / %d kg" % [day.get_total_weight_kg(), config.weight_cap_kg]
 	if earned >= day.get_quota() and day.get_total_weight_kg() <= config.weight_cap_kg:
 		%WeightLabel.text += "  ·  rent covered"
@@ -235,7 +240,7 @@ func _build_hud() -> void:
 		item.custom_minimum_size.y = 64
 	_guide_button.custom_minimum_size = Vector2(190, 64)
 	UiKit.style_action(_cast_button, Color("346f9f"))
-	UiKit.style_action(_return_button, RETURN_GREY)
+	_style_return_button(false)
 	UiKit.style_action(_guide_button, Color("715a92"))
 	_cast_button.pressed.connect(func(): cast_requested.emit())
 	_return_button.pressed.connect(func(): return_requested.emit())
@@ -334,3 +339,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _on_resized() -> void:
 	if _sea_report.visible:
 		_sea_report.reveal()
+
+
+## Below-rent grey is an available action, not a disabled state.
+func _style_return_button(rent_covered: bool) -> void:
+	UiKit.style_action(_return_button, RETURN_GOLD if rent_covered else RETURN_GREY, Color("192c37") if rent_covered else UiKit.INK)
+	if not rent_covered:
+		_return_button.add_theme_stylebox_override("normal", UiKit.box(RETURN_GREY, 10, 16, Color("b6c5cc"), 2))
+		_return_button.add_theme_stylebox_override("hover", UiKit.box(RETURN_GREY.lightened(0.18), 10, 16, Color("f4e9ce"), 2))
