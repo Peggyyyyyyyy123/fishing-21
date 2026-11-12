@@ -70,7 +70,7 @@ func render(session: GameSession, config: GameConfig, busy: bool) -> void:
 	_config = config
 	var earned := session.preview_income()
 	%DayLabel.text = "Day %d / %d" % [session.get_day_number(), session.get_total_days()]
-	%QuotaLabel.text = "Earned: %d gold" % earned
+	%QuotaLabel.text = "%d gold" % earned
 	_cast_button.text = "Cast · Bait %d / %d" % [day.get_bait_remaining(), config.bait_per_day]
 	_return_button.text = "Return · Pay %d gold" % day.get_quota()
 	%WeightLabel.text = "Net weight  %d / %d kg" % [day.get_total_weight_kg(), config.weight_cap_kg]
@@ -189,7 +189,15 @@ func _build_hud() -> void:
 	var header_row := UiKit.row(UiKit.panel(layout, Color(0.08, 0.19, 0.24, 0.88), 14, 20))
 	UiKit.named(UiKit.label("Day 1", 52), "DayLabel", header_row, self)
 	UiKit.space(header_row, false)
-	UiKit.named(UiKit.label("Earned: 0 gold", 48), "QuotaLabel", header_row, self)
+	var earnings := UiKit.row(header_row, 14)
+	var coin: TextureRect = UiKit.named(TextureRect.new(), "EarningsCoin", earnings, self)
+	coin.texture = preload("res://assets/ui/coin.svg")
+	coin.custom_minimum_size = Vector2(52, 52)
+	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	coin.tooltip_text = "Today's income"
+	UiKit.named(UiKit.label("0 gold", 48), "QuotaLabel", earnings, self)
 	UiKit.space(layout)
 	var tools := UiKit.row(layout)
 	_sea_button = UiKit.named(UiKit.button("Today's Sea"), "SeaButton", tools, self)
