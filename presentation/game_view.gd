@@ -11,6 +11,10 @@ signal restart_requested
 signal keep_requested
 signal release_requested
 
+const RETURN_GREY := Color("626c75")
+const RETURN_GOLD := Color("d7ab4c")
+
+var _rent_covered: bool = false
 var _session: GameSession
 var _config: GameConfig
 var _scenery: FishingView
@@ -49,11 +53,10 @@ func bind_session(session: GameSession) -> void:
 
 func show_menu(config: GameConfig) -> void:
 	_config = config
+	%MenuSubtitle.text = "FISHING 21  /  A %d-DAY VOYAGE" % config.get_total_days()
 	%StartButton.text = "Start your %d-day voyage" % config.get_total_days()
 	%StartButton.disabled = false
 	%MenuRules.text = "%d bait per day. A net with %d slots and a %d kg limit.\nEvery cast catches a fish. Keep it or release it.\nExactly %d kg doubles fish-sale income.\nDiscover new species for a gold reward, once per voyage.\nCover the daily rent for %d days to win." % [config.bait_per_day, config.net_slots, config.weight_cap_kg, config.weight_cap_kg, config.get_total_days()]
-	if config.sea_pool_size > 0:
-		%MenuRules.text += "\nHover Today's Sea for the sea report: %d fish at dawn." % config.sea_pool_size
 	_menu.show()
 	_result.hide()
 	_sea_report.hide()
@@ -72,9 +75,18 @@ func render(session: GameSession, config: GameConfig, busy: bool) -> void:
 	_config = config
 	var earned := session.preview_income()
 	%DayLabel.text = "Day %d / %d" % [session.get_day_number(), session.get_total_days()]
-	%QuotaLabel.text = "Earned: %d gold" % earned
+	%QuotaLabel.text = "Today: %d gold" % earned
+	var rent_covered := earned >= day.get_quota()
+	if rent_covered != _rent_covered:
+		_rent_covered = rent_covered
+		_style_return_button(rent_covered)
 	_cast_button.text = "Cast · Bait %d / %d" % [day.get_bait_remaining(), config.bait_per_day]
 	_return_button.text = "Return · Pay %d gold" % day.get_quota()
+	_return_button.tooltip_text = ""
+	if not rent_covered:
+		var shortfall := day.get_quota() - earned
+		_return_button.text += " · Need %d more" % shortfall
+		_return_button.tooltip_text = "You can still return now, but today's income is %d gold short of rent." % shortfall
 	%WeightLabel.text = "Net weight  %d / %d kg" % [day.get_total_weight_kg(), config.weight_cap_kg]
 	if earned >= day.get_quota() and day.get_total_weight_kg() <= config.weight_cap_kg:
 		%WeightLabel.text += "  ·  rent covered"
@@ -191,7 +203,15 @@ func _build_hud() -> void:
 	var header_row := UiKit.row(UiKit.panel(layout, Color(0.08, 0.19, 0.24, 0.88), 14, 20))
 	UiKit.named(UiKit.label("Day 1", 52), "DayLabel", header_row, self)
 	UiKit.space(header_row, false)
-	UiKit.named(UiKit.label("Earned: 0 gold", 48), "QuotaLabel", header_row, self)
+	var earnings := UiKit.row(header_row, 14)
+	var coin: TextureRect = UiKit.named(TextureRect.new(), "EarningsCoin", earnings, self)
+	coin.texture = preload("res://assets/ui/coin.svg")
+	coin.custom_minimum_size = Vector2(52, 52)
+	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	coin.tooltip_text = "Today's income"
+	UiKit.named(UiKit.label("Today: 0 gold", 48), "QuotaLabel", earnings, self)
 	UiKit.space(layout)
 	var tools := UiKit.row(layout)
 	_sea_button = UiKit.named(UiKit.button("Today's Sea"), "SeaButton", tools, self)
@@ -213,12 +233,15 @@ func _build_hud() -> void:
 	slots.custom_minimum_size.y = 72
 	var actions := UiKit.row(layout, 18)
 	_cast_button = UiKit.named(UiKit.button("Cast · Bait 6 / 6"), "CastButton", actions, self)
-	_return_button = UiKit.named(UiKit.button("Return · Pay 180 gold"), "ReturnButton", actions, self)
+	_return_button = UiKit.named(UiKit.button("Return"), "ReturnButton", actions, self)
 	_guide_button = UiKit.named(UiKit.button("Field Guide"), "CatalogButton", actions, self)
 	for item in [_cast_button, _return_button]:
 		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		item.custom_minimum_size.y = 64
 	_guide_button.custom_minimum_size = Vector2(190, 64)
+	UiKit.style_action(_cast_button, Color("346f9f"))
+	_style_return_button(false)
+	UiKit.style_action(_guide_button, Color("715a92"))
 	_cast_button.pressed.connect(func(): cast_requested.emit())
 	_return_button.pressed.connect(func(): return_requested.emit())
 	_guide_button.pressed.connect(open_field_guide)
@@ -231,11 +254,10 @@ func _build_menu_and_result() -> void:
 	var menu_panel := UiKit.panel(UiKit.centered(_menu), UiKit.DARK, 16, 36)
 	menu_panel.custom_minimum_size.x = 760
 	var menu_layout := UiKit.column(menu_panel, 22)
-	menu_layout.add_child(_centered_label("FISHING 21  /  A SEVEN-DAY VOYAGE", 18, Color("9ec9c6")))
+	UiKit.named(_centered_label("FISHING 21", 18, Color("9ec9c6")), "MenuSubtitle", menu_layout, self)
 	menu_layout.add_child(_centered_label("Every catch is a choice.", 48))
 	UiKit.named(_centered_label("", 23), "MenuRules", menu_layout, self)
 	UiKit.named(UiKit.button("Start your voyage"), "StartButton", menu_layout, self).pressed.connect(func(): start_requested.emit())
-	UiKit.named(UiKit.button("Field Guide"), "MenuCatalogButton", menu_layout, self).pressed.connect(open_field_guide)
 	menu_layout.add_child(_centered_label("F11: toggle fullscreen  ·  Esc: leave fullscreen", 16, Color("9cbdbd")))
 	_result = _overlay("ResultOverlay", 0.84)
 	var result_panel := UiKit.panel(UiKit.centered(_result), UiKit.DARK, 16, 32)
@@ -268,7 +290,7 @@ func _render_slots(day: FishingDay, session: GameSession, config: GameConfig) ->
 func _on_field_guide_closed() -> void:
 	_sea_report.blocked = _catch_card.visible
 	if _menu.visible:
-		%MenuCatalogButton.grab_focus()
+		%StartButton.grab_focus()
 	elif _result.visible:
 		%ResultCatalogButton.grab_focus()
 	else:
@@ -317,3 +339,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _on_resized() -> void:
 	if _sea_report.visible:
 		_sea_report.reveal()
+
+
+## Below-rent grey is an available action, not a disabled state.
+func _style_return_button(rent_covered: bool) -> void:
+	UiKit.style_action(_return_button, RETURN_GOLD if rent_covered else RETURN_GREY, Color("192c37") if rent_covered else UiKit.INK)
+	if not rent_covered:
+		_return_button.add_theme_stylebox_override("normal", UiKit.box(RETURN_GREY, 10, 16, Color("b6c5cc"), 2))
+		_return_button.add_theme_stylebox_override("hover", UiKit.box(RETURN_GREY.lightened(0.18), 10, 16, Color("f4e9ce"), 2))

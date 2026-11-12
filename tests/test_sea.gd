@@ -114,7 +114,7 @@ func _test_ui() -> void:
 	await process_frame
 	var view := controller.get_node("GameView") as GameView
 	var report := view.get_node("%SeaPanel") as SeaReportPanel
-	_check(view.get_node("%MenuRules").text.contains("sea report"), "Menu explains the sea report")
+	_check(not view.get_node("%MenuRules").text.contains("Hover Today"), "Menu omits the removed sea-report hint")
 	(view.get_node("%StartButton") as Button).pressed.emit()
 	_check(view.get_node("%ReturnButton").text.contains("Pay 40 gold"), "Rent shown on Return")
 	_check(view.get_node("%SeaTitle").text.contains("6 fish left"), "Sea title shows remaining outcomes")

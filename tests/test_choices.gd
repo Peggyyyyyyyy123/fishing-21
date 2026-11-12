@@ -26,7 +26,7 @@ func fresh(sequence: Array[Fish], bait: int = 6) -> GameSession:
 func run() -> void:
 	var c := config()
 	check(c.validate().is_empty(), "Default configuration valid")
-	check(c.daily_quotas == [180, 210, 240, 250, 260, 280, 300], "Rent curve")
+	check(c.daily_quotas == [60, 180, 280], "Rent curve")
 	check(c.fish_definitions.size() == 10, "Ten species")
 	var rewards := 0
 	for definition in c.fish_definitions:
@@ -69,7 +69,7 @@ func run() -> void:
 	check(day.is_finished() and day.get_total_weight_kg() == 4, "Final bait resolves before settlement")
 	var result := session.settle_day()
 	check(result.get_income() == 76 and result.get_discovery_income() == 12, "Species sale plus discovery")
-	check(session.settle_day().get_income() == 76 and session.get_coins() == 0, "Settlement idempotent, no savings cover")
+	check(session.settle_day().get_income() == 76 and session.get_coins() == 16, "Settlement idempotent, surplus saved")
 	check(session.get_catalog().is_discovered(&"gold_butterflyfish"), "Discovery kept for the rest of the voyage")
 	check(session.start_new_game(c), "Restart accepted")
 	check(session.get_catalog().get_discovered_count() == 0, "New voyage starts with an empty field guide")
@@ -85,9 +85,9 @@ func run() -> void:
 	check(session.preview_income() == 870, "Preview uses settlement rules: species price, perfect and discovery")
 	result = session.settle_day()
 	check(result.is_perfect() and result.get_income() == 870, "420 sale doubled, 30 bonus not doubled")
-	check(session.get_coins() == 690, "Rent deducted exactly once")
+	check(session.get_coins() == 810, "Rent deducted exactly once")
 	session.settle_day()
-	check(session.get_coins() == 690, "No double payment")
+	check(session.get_coins() == 810, "No double payment")
 	check(session.advance_day() and not session.advance_day(), "Advance once")
 	session.start_day(FixedCatchSource.new([Fish.new(&"sardine", 2)]))
 	check(session.get_current_day().get_discoveries().is_empty() and session.preview_income() == 0, "Daily discovery income resets")

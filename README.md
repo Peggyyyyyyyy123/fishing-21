@@ -1,6 +1,6 @@
 # Fishing21
 
-A small 2D fishing game built with Godot and GDScript for AP6412, Route A. Decide whether to cast again or return to shore: exceeding 21 kg breaks the net and loses the day's fish sales. Stage 2 makes the sea readable; Stage 3 makes every catch a choice: ten species with their own value, keep or release, and a field guide of discoveries.
+A small 2D fishing game built with Godot and GDScript for AP6412, Route A. Decide whether to cast again or return to shore: exceeding 21 kg breaks the net and loses the day's fish sales. Stage 2 makes the sea readable; Stage 3 makes every catch a choice: ten species with their own value, keep or release, and a field guide of discoveries. The current refinement build is a **three-day voyage**, with daily rents of **60, 180 and 280 gold**.
 
 ## Group and responsibility
 
@@ -8,7 +8,7 @@ Group: **Group5**.
 
 | Member | GitHub | Personal branches | Main responsibility |
 | --- | --- | --- | --- |
-| Li Peiqi | `Peggyyyyyyyy123` | `LPQ/featrue-build`, `LPQ/featrue-stage1` | Stage 1 implementation, tests and freeze ([contribution record](evidence/LPQ/contribution.md)) |
+| Li Peiqi | `Peggyyyyyyyy123` | `LPQ/featrue-build`, `LPQ/featrue-stage1`, `LPQ/refinement` | Stage 1 implementation, tests and freeze; post-Stage 3 playtest refinements ([contribution record](evidence/LPQ/contribution.md)) |
 | Chin Hsien Yeh | `Lecter1007` | `YCH/stage-2`, `YCH/stage-3` | Stage 2 and Stage 3 design and implementation, Class Maps and change maps |
 
 ## Project status
@@ -19,7 +19,7 @@ Group: **Group5**.
 | Stage 2 | [`stage-2`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-2) | Finite visible daily sea, sea report, next-cast odds, rent in kilograms. See [Stage 2 rationale](docs/design_rationale_stage_2.md) |
 | Stage 3 | [`stage-3`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-3) | Ten species with prices and rarity, keep or release, discovery rewards, field guide, rents 180–300, full-screen interface. See [Stage 3 rationale](docs/design_rationale_stage_3.md) |
 
-Each tag is independently runnable. Earlier tags are never moved.
+Each tag preserves its independently runnable stage version. Earlier tags are never moved. The three-day balance and latest interface changes were developed on [`LPQ/refinement`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/LPQ/refinement) and are now integrated into `main`. They are not included in the frozen tags.
 
 ## Requirements
 
@@ -33,21 +33,21 @@ Use the tested editor version for reproducible assessment. Other Godot versions 
 
 ## Get the project and run
 
-Clone the repository and check out the version to run (`stage-1`, `stage-2`, ...):
+Clone the repository and check out the current three-day refinement build:
 
 ```powershell
 git clone https://github.com/Peggyyyyyyyy123/fishing-21.git
 cd fishing-21
-git checkout stage-3
+git checkout main
 ```
 
-This is a private repository, so access requires an authorised GitHub account.
+To run a frozen assessment stage instead, use `git checkout stage-1`, `git checkout stage-2` or `git checkout stage-3`. Those versions retain their original rules and seven-day voyages. Private repositories require an authorised GitHub account.
 
 1. Open the Godot Project Manager and choose **Import**.
 2. Select this folder's `project.godot`, then open the project.
 3. Allow the initial resource import to finish.
 4. Press **F5**, or click **Run Project**. The configured main scene is `scenes/main.tscn`.
-5. Click **Start your 7-day voyage** to play.
+5. Click **Start your 3-day voyage** to play.
 
 No export or separate compilation step is needed to run this GDScript project in the editor. Godot regenerates its `.godot` cache locally; the cache is intentionally excluded from Git.
 
@@ -69,19 +69,19 @@ For a fresh test-only import without the editor window, use `--headless --editor
 
 | Button | Action |
 | --- | --- |
-| Start your 7-day voyage | Start a new run on Day 1. The displayed day count follows the configuration. |
+| Start your 3-day voyage | Start a new run on Day 1. The displayed day count follows the configuration. |
 | Cast · Bait n / 6 | Spend one bait and draw a catch. Input is temporarily locked during the casting animation. |
 | Keep / Release (catch card) | Put the fish in the net, or let it go. The bait stays spent either way. An overweight catch is labelled on Keep, and Release has focus. |
-| Return · Pay rent | End the current day voluntarily and display settlement. Not available while a catch card is open. |
+| Return · Pay rent | End the current day voluntarily and display settlement. Grey remains clickable and shows the rent shortfall, with a border and hover feedback; gold means today's income covers rent. Not available while a catch card is open or casting is in progress. |
 | Today's Sea | Hover or focus to see the sea report. |
-| Field Guide | Open the collection from the menu, the game or the result screen. Esc closes it. |
+| Field Guide | Open the collection from the game or the result screen. The opening menu has no Field Guide button. Esc closes it. |
 | Continue · Next day | After a passing non-final day, start the next day with a fresh net and bait. |
 | Start a new voyage | From the result screen, reset the run to Day 1 with zero savings. The field guide starts empty again. |
 | F11 / Esc | Toggle fullscreen / leave fullscreen. The game starts fullscreen. |
 
 Use the mouse for the primary interaction. The game requires no movement controls.
 
-The rule tables below describe Stage 1 and the changes added in later stages. Stage 3 changes several Stage 1 values; see [Stage 3 rules](#stage-3-rules-every-catch-is-a-choice).
+The Stage 1 and Stage 2 sections below describe the frozen historical versions. The Stage 3 section describes the extended mechanics and distinguishes the original tag from the current refinement build. In the current build, the top-right coin display **Today** means today's income before rent, not accumulated savings. Cover each day's rent to continue; passing Day 3 wins. Savings still cannot cover a daily shortfall.
 
 ## Stage 1 rules
 
@@ -114,7 +114,7 @@ Exactly 21 kg does not itself force a return. If bait and slots remain, casting 
 | Large fish | 8% | 11–16 kg |
 | Huge fish | 2% | 17–21 kg |
 
-The source selects an outcome by probability, then chooses a weight uniformly within that outcome's inclusive integer range. Numeric defaults and display names are stored in `config/default_game_config.tres`.
+The source selects an outcome by probability, then chooses a weight uniformly within that outcome's inclusive integer range. Each checked-out version stores its own numeric defaults and display names in `config/default_game_config.tres`; the current file contains the ten-species configuration, not this historical Stage 1 table.
 
 ## Stage 2 rules: a readable sea
 
@@ -134,7 +134,8 @@ All Stage 1 rules above still apply. Stage 2 adds information, not new ways to e
 - After each catch a card shows the fish's weight, rarity and sale value. **Keep** puts it in the net; **Release** lets it go. Either way the bait is spent and the fish leaves today's sea.
 - Daily income = sale value of the net (species price × kg), **×2 at exactly 21 kg**, plus **discovery rewards** for species caught for the first time. On a bust the sale value is lost but discovery rewards are kept. Discovery rewards are never doubled.
 - The **field guide** records every species caught in the current voyage (kept or released), its catch count and biggest weight. Starting a new voyage empties it, so discovery rewards are available again in every voyage. It is not saved to disk. (Changed after `stage-3`; see [post-Stage 3 fixes](docs/post_stage_3_fixes.md).)
-- **Daily rents: 180, 210, 240, 250, 260, 280, 300 gold.**
+- **Current refinement build:** 3 days, with rents of **60, 180 and 280 gold**. Passing Day 3 wins; there is no Day 4. Only rent and run length were changed for difficulty; fish probabilities, weights, prices, discovery rewards, bait, slots and the 21 kg rule are unchanged. Run length follows the quota list in `GameConfig`, and menu/day labels follow that configuration.
+- **Frozen `stage-3` tag:** retains the original seven-day rents of 180, 210, 240, 250, 260, 280 and 300 gold.
 - The sea report opens on hover over *Today's Sea*. The next-cast percentages from Stage 2 are no longer shown.
 
 ## Code structure and design
@@ -160,7 +161,9 @@ Design documents:
 | Stage 1 | [class_map_stage_1](docs/class_map_stage_1.md) | [design_rationale_stage_1](docs/design_rationale_stage_1.md) | — |
 | Stage 2 | [class_map_stage_2](docs/class_map_stage_2.md) | [design_rationale_stage_2](docs/design_rationale_stage_2.md) | [Stage 1 → 2](docs/change_map_stage_1_to_2.md) |
 | Stage 3 | [class_map_stage_3](docs/class_map_stage_3.md) | [design_rationale_stage_3](docs/design_rationale_stage_3.md) | [Stage 2 → 3](docs/change_map_stage_2_to_3.md) |
-| After Stage 3 | [final class map](docs/post_stage_3_fixes.md#final-class-map) | [post-Stage 3 fixes](docs/post_stage_3_fixes.md) | Stage 3 → current `main` |
+| After Stage 3 | [class-map update](docs/post_stage_3_fixes.md#final-class-map) | [post-Stage 3 fixes](docs/post_stage_3_fixes.md) | Stage 3 → post-stage fixes on `main` |
+
+The post-stage document records the earlier catalogue reset and header fixes. Later three-day balance and interface refinements are summarised in this README; the older document still contains historical seven-day wording. The refinements add no production classes.
 
 `GameSession` owns progression, coin payment and the `FishCatalog`. `FishingDay` owns casting, bait, the catch waiting for keep/release, today's discoveries and the daily end conditions. `FishingNet` stores catches. `SettlementRules` owns every money rule (species price, perfect multiplier, bust income, discovery rewards) and calculates a `DayResult` or a preview without paying coins itself. State guards prevent duplicate settlements and skipped days.
 
@@ -187,7 +190,7 @@ foreach ($suite in $testSuites) {
 }
 ```
 
-Recorded results for the current `main` (Stage 3 plus the [post-Stage 3 fixes](docs/post_stage_3_fixes.md)). The Stage 1 suites keep their assertions: they replay Stage 1 forced retention with the `KeepEveryCatch` test player and use `LegacyTestConfig` for Stage 1 fish and rents. Only foundation and initialization check the new production values.
+Recorded on **2026-11-12** for source commit **`cf84b44`** on `LPQ/refinement`: **10 suites, 1525 checks, 0 failures**. Legacy scenarios replay Stage 1 forced retention using `KeepEveryCatch` and `LegacyTestConfig`. Production configuration and three-day progression are also checked, including the absence of a fourth day and restart after victory.
 
 | Suite | Checks | Failures |
 | --- | ---: | ---: |
@@ -195,15 +198,15 @@ Recorded results for the current `main` (Stage 3 plus the [post-Stage 3 fixes](d
 | Initialization | 44 | 0 |
 | Casting | 54 | 0 |
 | Settlement | 50 | 0 |
-| Progression | 408 | 0 |
-| UI | 79 | 0 |
-| Review regressions | 12 | 0 |
+| Progression | 427 | 0 |
+| UI | 39 | 0 |
+| Review regressions | 13 | 0 |
 | Sea report (Stage 2) | 41 | 0 |
 | Catch choices and catalogue (Stage 3) | 670 | 0 |
-| Interface (Stage 3) | 126 | 0 |
-| **Total** | **1535** | **0** |
+| Interface (Stage 3) | 136 | 0 |
+| **Total** | **1525** | **0** |
 
-These results cover the recorded source version and do not guarantee untested changes or environments. Tests include probability boundaries, 21/22 kg limits, keep/release, discovery rewards, per-voyage catalogue reset, ending priority, repeated input, settlement idempotence, all seven days, failure with savings and restart.
+These results cover the recorded source version and do not guarantee untested changes or environments. Tests include probability boundaries, 21/22 kg limits, keep/release, discovery rewards, per-voyage catalogue reset, ending priority, repeated input, settlement idempotence, the current three-day voyage, legacy seven-day progression, failure with savings and restart.
 
 `test_ui.gd` instantiates the production scene, uses a fixed catch source, and triggers actual button-signal connections to reproduce victory, bust and restart. It runs headlessly and does not replace mouse/keyboard or visual checks. `test_progression.gd` includes a mixed seven-day scenario with expected final savings of **520 gold** (Stage 1 economy).
 
@@ -213,15 +216,16 @@ See [the acceptance checklist](docs/stage_1_acceptance.md) for observed manual S
 
 - Basic native 2D scenery and casting animation, with no audio and no save/load.
 - With ten species, the hover sea report is tall and can overlap the header on short screens.
-- The modelled seven-day victory rate under the Stage 3 rents is low (under 1% for the calibration policy, which ignores discovery rewards). Playtests are still needed.
+- The old seven-day calibration in `tools/balance_choices.py` and the Stage 3 design notes describes the original balance. Its victory-rate estimate does not describe the current three-day build; no verified player win rate is claimed for the new rents.
 - Shops and upgrades are not implemented.
 - Only Windows with the tested Godot version has been verified.
-- Some manual acceptance items remain open, including a complete live seven-day demonstration and keyboard navigation.
+- Some manual acceptance items remain open, including a complete live three-day demonstration, keyboard navigation and separate checks of the frozen stage versions.
 - Godot's embedded game preview may display at 1.0× with surrounding margins. This is separate from resizing the standalone game window.
 
 ## GitHub and assessment evidence
 
 - [Repository](https://github.com/Peggyyyyyyyy123/fishing-21)
+- Integrated refinement branch: [LPQ/refinement](https://github.com/Peggyyyyyyyy123/fishing-21/tree/LPQ/refinement) · [main → refinement comparison](https://github.com/Peggyyyyyyyy123/fishing-21/compare/main...LPQ/refinement)
 - Personal branches: [LPQ/featrue-build](https://github.com/Peggyyyyyyyy123/fishing-21/tree/LPQ/featrue-build), [LPQ/featrue-stage1](https://github.com/Peggyyyyyyyy123/fishing-21/tree/LPQ/featrue-stage1), [YCH/stage-2](https://github.com/Peggyyyyyyyy123/fishing-21/tree/YCH/stage-2), [YCH/stage-3](https://github.com/Peggyyyyyyyy123/fishing-21/tree/YCH/stage-3) (the `featrue` spelling matches the repository)
 - [Pull requests (open and closed)](https://github.com/Peggyyyyyyyy123/fishing-21/pulls?q=is%3Apr) · [Merge history on main](https://github.com/Peggyyyyyyyy123/fishing-21/commits/main)
 - Tags: [`stage-1`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-1), [`stage-2`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-2), [`stage-3`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-3) · [all tags](https://github.com/Peggyyyyyyyy123/fishing-21/tags)
@@ -236,7 +240,7 @@ AI communication logs:
 | Li Peiqi | [evidence/LPQ](evidence/LPQ/README.md) |
 | Chin Hsien Yeh | `evidence/YCH/` (to be added by the student) |
 
-Still to complete before submission: the remaining manual acceptance items, each student's full AI logs, the group report and the declarations.
+Still to complete before submission: retain the completed manual acceptance evidence, append Li Peiqi's later AI conversations beyond the existing 2026-11-07 export, add Chin Hsien Yeh's complete AI logs (or a no-AI declaration where applicable), and prepare the final group report, signed declarations and submission ZIP. Include evidence that the lecturer's later requirements were received only after the preceding stage was frozen.
 
 ## Development notes
 

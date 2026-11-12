@@ -5,6 +5,7 @@ var _failures: int = 0
 
 
 func _initialize() -> void:
+	_test_default_three_day_victory()
 	_test_seven_day_victory()
 	_test_failure_on_each_day()
 	_test_savings_cannot_pay_rent()
@@ -167,3 +168,30 @@ func _check(condition: bool, label: String) -> void:
 	if not condition:
 		_failures += 1
 		push_error(label)
+
+
+func _test_default_three_day_victory() -> void:
+	var config := load("res://config/default_game_config.tres") as GameConfig
+	var session := GameSession.new()
+	_check(session.start_new_game(config), "Default three-day voyage starts")
+	_check(session.get_total_days() == 3, "Default voyage lasts three days")
+	var weights := [6, 18, 21]
+	var species: Array[StringName] = [&"sea_bass", &"golden_tuna", &"golden_tuna"]
+	var expected_income := [78, 390, 840]
+	var expected_coins := 0
+	for index in range(3):
+		_check(session.start_day(FixedCatchSource.new([Fish.new(species[index], weights[index])])), "Start configured day")
+		var day := session.get_current_day()
+		_check(day.get_quota() == config.daily_quotas[index], "Day uses configured rent")
+		day.cast()
+		day.resolve_catch(true)
+		day.return_to_shore()
+		var result := session.settle_day()
+		expected_coins += expected_income[index] - config.daily_quotas[index]
+		_check(result.is_passed() and result.get_income() == expected_income[index], "Configured rent can be paid")
+		_check(session.get_coins() == expected_coins, "Daily surplus calculated correctly")
+		if index < 2:
+			_check(session.get_state() == GameSession.State.DAY_SETTLED and session.advance_day(), "First two days continue without early victory")
+	_check(session.get_state() == GameSession.State.VICTORY and session.get_day_number() == 3, "Third passing day wins")
+	_check(not session.advance_day() and not session.start_day(), "No fourth day after victory")
+	_check(session.start_new_game(config) and session.get_day_number() == 1 and session.get_coins() == 0, "Three-day voyage restarts cleanly")

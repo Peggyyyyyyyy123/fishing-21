@@ -12,7 +12,7 @@ func _initialize() -> void:
 		quit(1)
 		return
 	_check(config.validate().is_empty(), "Default config is valid")
-	_check(config.get_total_days() == 7, "Seven daily quotas")
+	_check(config.get_total_days() == 3, "Three daily quotas")
 	_check(config.fish_definitions.size() == 10, "Ten fish species")
 	var expected_probabilities := [.20, .18, .16, .12, .10, .08, .06, .05, .03, .02]
 	var expected_min := [1, 2, 3, 4, 6, 8, 2, 11, 5, 17]

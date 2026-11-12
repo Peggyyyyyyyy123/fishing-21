@@ -122,5 +122,5 @@ price_per_kg = 10
 perfect_multiplier = 2
 bust_income = 0
 sea_pool_size = 12
-daily_quotas = Array[int]([180, 210, 240, 250, 260, 280, 300])
+daily_quotas = Array[int]([60, 180, 280])
 fish_definitions = Array[ExtResource("2_definition")]([SubResource("sardine"), SubResource("mackerel"), SubResource("horse_mackerel"), SubResource("mullet"), SubResource("sea_bass"), SubResource("red_seabream"), SubResource("gold_butterflyfish"), SubResource("grouper"), SubResource("moon_angelfish"), SubResource("golden_tuna")])
