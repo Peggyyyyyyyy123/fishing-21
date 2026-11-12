@@ -32,7 +32,7 @@ func _test_start_lifecycle(config: GameConfig) -> void:
 	_check(session.start_day(), "First day starts")
 	var first_day := session.get_current_day()
 	_check(session.get_state() == GameSession.State.DAY_ACTIVE, "Day is active")
-	_check(first_day.get_day_number() == 1 and first_day.get_quota() == 40, "First day uses first quota")
+	_check(first_day.get_day_number() == 1 and first_day.get_quota() == 180, "First day uses first quota")
 	_check(first_day.get_bait_remaining() == 6, "Day begins with six bait")
 	_check(first_day.get_fish_count() == 0 and first_day.get_total_weight_kg() == 0, "Day begins with empty net")
 	_check(not session.start_day(), "Duplicate day-start request rejected")
@@ -83,7 +83,7 @@ func _test_run_isolation(config: GameConfig) -> void:
 	_check(second.start_new_game(custom) and second.start_day(), "Separate run uses updated configuration")
 	_check(second.get_current_day().get_bait_remaining() == 9 and second.get_current_day().get_quota() == 99, "New run sees updated values")
 	_check(first.get_current_day() != second.get_current_day(), "Sessions do not share day state")
-	_check(config.bait_per_day == 6 and config.daily_quotas[0] == 40, "Default resource remains unchanged")
+	_check(config.bait_per_day == 6 and config.daily_quotas[0] == 180, "Default resource remains unchanged")
 
 
 func _test_day_initialization() -> void:

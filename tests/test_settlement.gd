@@ -10,6 +10,7 @@ class ReturningSource:
 
 var _checks: int = 0
 var _failures: int = 0
+var _no_species: Array[FishDefinition] = []  # Rules with only the base price, as in Stage 1.
 
 
 func _initialize() -> void:
@@ -25,12 +26,12 @@ func _make_day(weights: Array[int], bait: int = 6, quota: int = 40) -> FishingDa
 		catches.append(null if weight == 0 else Fish.new(&"test", weight))
 	var day := FishingDay.new(1, quota, bait, 5, 21, FixedCatchSource.new(catches))
 	for weight in weights:
-		day.cast()
+		KeepEveryCatch.cast(day)
 	return day
 
 
 func _test_return_and_calculation() -> void:
-	var rules := SettlementRules.new(21, 10, 2, 0)
+	var rules := SettlementRules.new(_no_species, 21, 10, 2, 0)
 	_check(rules.calculate(null) == null, "Cannot calculate missing day")
 	var day := _make_day([3, 4, 2])
 	_check(rules.calculate(day) == null, "Cannot settle ongoing day")
@@ -38,7 +39,7 @@ func _test_return_and_calculation() -> void:
 	_check(day.return_to_shore(), "Player can return with partial net")
 	_check(day.get_end_reason() == FishingDay.EndReason.RETURNED, "Return records its own end reason")
 	_check(day.get_bait_remaining() == bait, "Returning costs no bait")
-	_check(not day.return_to_shore() and not day.cast().was_accepted(), "Repeated return and cast after return rejected")
+	_check(not day.return_to_shore() and not KeepEveryCatch.cast(day).was_accepted(), "Repeated return and cast after return rejected")
 	var result := rules.calculate(day)
 	_check(result.get_income() == 90 and result.get_net_income() == 50, "Normal income minus quota")
 	_check(result.is_passed() and result.get_coin_gain() == 50 and not result.is_perfect(), "Ordinary passing day")
@@ -78,7 +79,7 @@ func _test_return_and_calculation() -> void:
 	_check(rules.calculate(day).get_income() == 0, "Bait exhaustion settles empty net")
 	day = _make_day([2], 1)
 	_check(rules.calculate(day).get_income() == 20, "Last bait fish is included in settlement")
-	var custom_rules := SettlementRules.new(21, 3, 3, 7)
+	var custom_rules := SettlementRules.new(_no_species, 21, 3, 3, 7)
 	day = _make_day([21])
 	day.return_to_shore()
 	_check(custom_rules.calculate(day).get_income() == 189, "Price and multiplier come from supplied rules")
@@ -87,19 +88,19 @@ func _test_return_and_calculation() -> void:
 	var source := ReturningSource.new()
 	day = FishingDay.new(1, 40, 6, 5, 21, source)
 	source.day = day
-	day.cast()
+	KeepEveryCatch.cast(day)
 	_check(not source.returned and not day.is_finished(), "Cannot return in middle of resolving a cast")
 	source.day = null
 
 
 func _test_session_settlement() -> void:
-	var config := load("res://config/default_game_config.tres") as GameConfig
+	var config := LegacyTestConfig.make()
 	var session := GameSession.new()
 	_check(session.settle_day() == null and session.get_last_result() == null, "Unstarted session has no settlement")
 	session.start_new_game(config)
 	_check(session.settle_day() == null, "Cannot settle before day starts")
 	session.start_day(FixedCatchSource.new([Fish.new(&"small", 4)]))
-	session.get_current_day().cast()
+	KeepEveryCatch.cast(session.get_current_day())
 	_check(session.settle_day() == null and session.get_coins() == 0, "No premature payment during active day")
 	session.get_current_day().return_to_shore()
 	var result := session.settle_day()
@@ -108,8 +109,8 @@ func _test_session_settlement() -> void:
 	_check(not session.start_day(), "Settlement does not silently start or advance next day")
 	session.start_new_game(config)
 	session.start_day(FixedCatchSource.new([Fish.new(&"mid", 10), Fish.new(&"big", 11)]))
-	session.get_current_day().cast()
-	session.get_current_day().cast()
+	KeepEveryCatch.cast(session.get_current_day())
+	KeepEveryCatch.cast(session.get_current_day())
 	session.get_current_day().return_to_shore()
 	result = session.settle_day()
 	_check(result.get_income() == 420 and session.get_coins() == 380, "Session credits only surplus")
@@ -123,7 +124,7 @@ func _test_session_settlement() -> void:
 	session.start_new_game(config)
 	_check(session.get_coins() == 0 and session.get_last_result() == null, "Restart clears real nonzero coins and result")
 	session.start_day(FixedCatchSource.new([Fish.new(&"small", 3)]))
-	session.get_current_day().cast()
+	KeepEveryCatch.cast(session.get_current_day())
 	session.get_current_day().return_to_shore()
 	result = session.settle_day()
 	_check(not result.is_passed() and session.get_state() == GameSession.State.GAME_OVER, "Income below quota ends game")
@@ -136,7 +137,7 @@ func _test_session_settlement() -> void:
 	custom.price_per_kg = 100
 	custom.daily_quotas[0] = 999
 	session.start_day(FixedCatchSource.new([Fish.new(&"small", 4)]))
-	session.get_current_day().cast()
+	KeepEveryCatch.cast(session.get_current_day())
 	session.get_current_day().return_to_shore()
 	result = session.settle_day()
 	_check(result.get_income() == 20 and result.get_quota() == 10 and session.get_coins() == 10, "Settlement uses captured run config")

@@ -12,6 +12,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_controller = load("res://scenes/main.tscn").instantiate() as GameController
+	_controller.catalog_store = FishCatalogStore.new("res://tests/.ui_catalog.cfg")
 	_controller.cast_delay_seconds = 0.001
 	_controller.catch_source_factory = func() -> CatchSource: return FixedCatchSource.new([Fish.new(&"huge", 21)])
 	root.add_child(_controller)
@@ -31,6 +32,7 @@ func _run() -> void:
 		_check(session.get_current_day().get_bait_remaining() == 5, "Animation lock prevents duplicate cast")
 		_check(_button("CastButton").disabled and _button("ReturnButton").disabled, "Both buttons locked during cast")
 		await create_timer(0.03).timeout
+		(_view.get_node("%KeepButton") as Button).pressed.emit()
 		_check(session.get_current_day().get_total_weight_kg() == 21, "Catch reaches model and HUD")
 		_check(not _button("ReturnButton").disabled, "Input restored after cast")
 		_button("ReturnButton").pressed.emit()
@@ -51,6 +53,7 @@ func _run() -> void:
 	for index in range(2):
 		_button("CastButton").pressed.emit()
 		await create_timer(0.03).timeout
+		(_view.get_node("%KeepButton") as Button).pressed.emit()
 	_check(session.get_state() == GameSession.State.GAME_OVER and _view.get_node("%ResultOverlay").visible, "Bust automatically settles through UI")
 	_check(session.get_last_result().get_income() == 0, "Bust UI shows zero income")
 	_check(not _button("ContinueButton").visible, "Failure hides continue")
@@ -59,6 +62,7 @@ func _run() -> void:
 	_check(session.get_state() == GameSession.State.GAME_OVER and session.get_last_result().get_income() == 0, "Empty return fails through UI")
 	_controller.queue_free()
 	await process_frame
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("res://tests/.ui_catalog.cfg"))
 	print("UI: %d checks, %d failures" % [_checks, _failures])
 	quit(0 if _failures == 0 else 1)
 

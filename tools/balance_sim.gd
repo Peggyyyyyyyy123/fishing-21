@@ -1,5 +1,6 @@
 extends SceneTree
 ## Dev helper: compares stop strategies under independent draws vs the finite daily sea.
+## Forced-keep baseline (every catch kept); income is weight-based, not the Stage 3 species economy.
 ## Usage: --headless --script res://tools/balance_sim.gd -- [days] [pool sizes, e.g. 0,8,12]
 ## Income is reported in kg-equivalent (gold / price_per_kg), as in the config workbook.
 
@@ -41,7 +42,8 @@ func _simulate(config: GameConfig, rng: RandomNumberGenerator, days: int, label:
 			var forecast := CatchForecast.calculate(config.fish_definitions, day.get_next_cast_chances(), day.get_total_weight_kg(), config.weight_cap_kg)
 			if not keep_casting.call(day.get_total_weight_kg(), forecast):
 				break
-			day.cast()
+			if day.cast().get_status() == CastResult.Status.CAUGHT:
+				day.resolve_catch(true)  # Forced-keep baseline, as in Stage 1.
 		if not day.is_finished():
 			day.return_to_shore()
 		var weight := day.get_total_weight_kg()

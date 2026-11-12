@@ -13,10 +13,10 @@ func _initialize() -> void:
 		return
 	_check(config.validate().is_empty(), "Default config is valid")
 	_check(config.get_total_days() == 7, "Seven daily quotas")
-	_check(config.fish_definitions.size() == 5, "Five catch outcomes")
-	var expected_probabilities := [0.2, 0.55, 0.15, 0.08, 0.02]
-	var expected_min := [0, 1, 5, 11, 17]
-	var expected_max := [0, 4, 10, 16, 21]
+	_check(config.fish_definitions.size() == 10, "Ten fish species")
+	var expected_probabilities := [.20, .18, .16, .12, .10, .08, .06, .05, .03, .02]
+	var expected_min := [1, 2, 3, 4, 6, 8, 2, 11, 5, 17]
+	var expected_max := [3, 4, 5, 6, 9, 11, 4, 15, 8, 21]
 	for index in range(config.fish_definitions.size()):
 		var definition := config.fish_definitions[index]
 		_check(is_equal_approx(definition.probability, expected_probabilities[index]), "Outcome probability %d" % index)

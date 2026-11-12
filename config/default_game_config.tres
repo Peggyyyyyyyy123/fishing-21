@@ -1,48 +1,117 @@
-[gd_resource type="Resource" script_class="GameConfig" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="GameConfig" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://config/game_config.gd" id="1_config"]
 [ext_resource type="Script" path="res://config/fish_definition.gd" id="2_definition"]
 
-[sub_resource type="Resource" id="Empty"]
+[sub_resource type="Resource" id="sardine"]
 script = ExtResource("2_definition")
-species_id = &"nothing"
-display_name = "No catch"
+species_id = &"sardine"
+display_name = "Sardine"
 probability = 0.2
-min_weight_kg = 0
-max_weight_kg = 0
-is_empty_catch = true
-
-[sub_resource type="Resource" id="Small"]
-script = ExtResource("2_definition")
-species_id = &"small"
-display_name = "Small fish"
-probability = 0.55
 min_weight_kg = 1
+max_weight_kg = 3
+price_per_kg = 10
+discovery_reward = 3
+rarity = "Common"
+
+[sub_resource type="Resource" id="mackerel"]
+script = ExtResource("2_definition")
+species_id = &"mackerel"
+display_name = "Mackerel"
+probability = 0.18
+min_weight_kg = 2
 max_weight_kg = 4
+price_per_kg = 10
+discovery_reward = 3
+rarity = "Common"
 
-[sub_resource type="Resource" id="Medium"]
+[sub_resource type="Resource" id="horse_mackerel"]
 script = ExtResource("2_definition")
-species_id = &"mid"
-display_name = "Medium fish"
-probability = 0.15
-min_weight_kg = 5
-max_weight_kg = 10
+species_id = &"horse_mackerel"
+display_name = "Horse Mackerel"
+probability = 0.16
+min_weight_kg = 3
+max_weight_kg = 5
+price_per_kg = 10
+discovery_reward = 3
+rarity = "Common"
 
-[sub_resource type="Resource" id="Large"]
+[sub_resource type="Resource" id="mullet"]
 script = ExtResource("2_definition")
-species_id = &"big"
-display_name = "Large fish"
+species_id = &"mullet"
+display_name = "Mullet"
+probability = 0.12
+min_weight_kg = 4
+max_weight_kg = 6
+price_per_kg = 10
+discovery_reward = 3
+rarity = "Common"
+
+[sub_resource type="Resource" id="sea_bass"]
+script = ExtResource("2_definition")
+species_id = &"sea_bass"
+display_name = "Sea Bass"
+probability = 0.1
+min_weight_kg = 6
+max_weight_kg = 9
+price_per_kg = 12
+discovery_reward = 6
+rarity = "Uncommon"
+
+[sub_resource type="Resource" id="red_seabream"]
+script = ExtResource("2_definition")
+species_id = &"red_seabream"
+display_name = "Red Seabream"
 probability = 0.08
-min_weight_kg = 11
-max_weight_kg = 16
+min_weight_kg = 8
+max_weight_kg = 11
+price_per_kg = 12
+discovery_reward = 6
+rarity = "Uncommon"
 
-[sub_resource type="Resource" id="Huge"]
+[sub_resource type="Resource" id="gold_butterflyfish"]
 script = ExtResource("2_definition")
-species_id = &"huge"
-display_name = "Huge fish"
+species_id = &"gold_butterflyfish"
+display_name = "Golden Butterflyfish"
+probability = 0.06
+min_weight_kg = 2
+max_weight_kg = 4
+price_per_kg = 16
+discovery_reward = 12
+rarity = "Rare"
+
+[sub_resource type="Resource" id="grouper"]
+script = ExtResource("2_definition")
+species_id = &"grouper"
+display_name = "Grouper"
+probability = 0.05
+min_weight_kg = 11
+max_weight_kg = 15
+price_per_kg = 16
+discovery_reward = 12
+rarity = "Rare"
+
+[sub_resource type="Resource" id="moon_angelfish"]
+script = ExtResource("2_definition")
+species_id = &"moon_angelfish"
+display_name = "Moon Angelfish"
+probability = 0.03
+min_weight_kg = 5
+max_weight_kg = 8
+price_per_kg = 20
+discovery_reward = 20
+rarity = "Epic"
+
+[sub_resource type="Resource" id="golden_tuna"]
+script = ExtResource("2_definition")
+species_id = &"golden_tuna"
+display_name = "Golden Tuna"
 probability = 0.02
 min_weight_kg = 17
 max_weight_kg = 21
+price_per_kg = 20
+discovery_reward = 30
+rarity = "Legendary"
 
 [resource]
 script = ExtResource("1_config")
@@ -53,5 +122,5 @@ price_per_kg = 10
 perfect_multiplier = 2
 bust_income = 0
 sea_pool_size = 12
-daily_quotas = Array[int]([40, 50, 60, 70, 80, 90, 100])
-fish_definitions = Array[ExtResource("2_definition")]([SubResource("Empty"), SubResource("Small"), SubResource("Medium"), SubResource("Large"), SubResource("Huge")])
+daily_quotas = Array[int]([180, 210, 240, 250, 260, 280, 300])
+fish_definitions = Array[ExtResource("2_definition")]([SubResource("sardine"), SubResource("mackerel"), SubResource("horse_mackerel"), SubResource("mullet"), SubResource("sea_bass"), SubResource("red_seabream"), SubResource("gold_butterflyfish"), SubResource("grouper"), SubResource("moon_angelfish"), SubResource("golden_tuna")])
