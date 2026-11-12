@@ -52,8 +52,6 @@ func show_menu(config: GameConfig) -> void:
 	%StartButton.text = "Start your %d-day voyage" % config.get_total_days()
 	%StartButton.disabled = false
 	%MenuRules.text = "%d bait per day. A net with %d slots and a %d kg limit.\nEvery cast catches a fish. Keep it or release it.\nExactly %d kg doubles fish-sale income.\nDiscover new species for a gold reward, once per voyage.\nCover the daily rent for %d days to win." % [config.bait_per_day, config.net_slots, config.weight_cap_kg, config.weight_cap_kg, config.get_total_days()]
-	if config.sea_pool_size > 0:
-		%MenuRules.text += "\nHover Today's Sea for the sea report: %d fish at dawn." % config.sea_pool_size
 	_menu.show()
 	_result.hide()
 	_sea_report.hide()
@@ -235,7 +233,6 @@ func _build_menu_and_result() -> void:
 	menu_layout.add_child(_centered_label("Every catch is a choice.", 48))
 	UiKit.named(_centered_label("", 23), "MenuRules", menu_layout, self)
 	UiKit.named(UiKit.button("Start your voyage"), "StartButton", menu_layout, self).pressed.connect(func(): start_requested.emit())
-	UiKit.named(UiKit.button("Field Guide"), "MenuCatalogButton", menu_layout, self).pressed.connect(open_field_guide)
 	menu_layout.add_child(_centered_label("F11: toggle fullscreen  ·  Esc: leave fullscreen", 16, Color("9cbdbd")))
 	_result = _overlay("ResultOverlay", 0.84)
 	var result_panel := UiKit.panel(UiKit.centered(_result), UiKit.DARK, 16, 32)
@@ -268,7 +265,7 @@ func _render_slots(day: FishingDay, session: GameSession, config: GameConfig) ->
 func _on_field_guide_closed() -> void:
 	_sea_report.blocked = _catch_card.visible
 	if _menu.visible:
-		%MenuCatalogButton.grab_focus()
+		%StartButton.grab_focus()
 	elif _result.visible:
 		%ResultCatalogButton.grab_focus()
 	else:
