@@ -44,6 +44,12 @@ func run() -> void:
 	check(view.get_node("%DayLabel").text == "Day 1 / 7", "Day label shows current and total days")
 	check(view.get_node("%QuotaLabel").text == "0 gold", "Large right daily earnings")
 	check((view.get_node("%EarningsCoin") as TextureRect).texture != null, "Income has a coin icon")
+	var return_button := view.get_node("%ReturnButton") as Button
+	check((return_button.get_theme_stylebox("normal") as StyleBoxFlat).bg_color == GameView.RETURN_GREY, "Return is grey below rent")
+	check(not return_button.disabled, "Grey return remains usable below rent")
+	var cast_color := (view.get_node("%CastButton").get_theme_stylebox("normal") as StyleBoxFlat).bg_color
+	var guide_color := (view.get_node("%CatalogButton").get_theme_stylebox("normal") as StyleBoxFlat).bg_color
+	check(cast_color != guide_color and cast_color != GameView.RETURN_GREY and guide_color != GameView.RETURN_GREY, "Three action buttons have distinct colours")
 	check(view.get_node("%DayLabel").get_theme_font_size("font_size") >= 48, "Day typography enlarged")
 	check(view.get_node("%CastButton").text.contains("Bait 6 / 6"), "Bait moved to Cast")
 	check(view.get_node("%ReturnButton").text.contains("Pay 180 gold"), "Rent moved to Return")

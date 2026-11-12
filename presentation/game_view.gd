@@ -11,6 +11,8 @@ signal restart_requested
 signal keep_requested
 signal release_requested
 
+const RETURN_GREY := Color("626c75")
+
 var _session: GameSession
 var _config: GameConfig
 var _scenery: FishingView
@@ -225,6 +227,9 @@ func _build_hud() -> void:
 		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		item.custom_minimum_size.y = 64
 	_guide_button.custom_minimum_size = Vector2(190, 64)
+	UiKit.style_action(_cast_button, Color("346f9f"))
+	UiKit.style_action(_return_button, RETURN_GREY)
+	UiKit.style_action(_guide_button, Color("715a92"))
 	_cast_button.pressed.connect(func(): cast_requested.emit())
 	_return_button.pressed.connect(func(): return_requested.emit())
 	_guide_button.pressed.connect(open_field_guide)

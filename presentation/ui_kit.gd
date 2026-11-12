@@ -127,3 +127,17 @@ static func make_theme() -> Theme:
 	ui.set_stylebox("background", "ProgressBar", box(Color("0b2c38"), 4, 0))
 	ui.set_stylebox("fill", "ProgressBar", box(Color("9cd6bc"), 4, 0))
 	return ui
+
+
+## Colours a single action without changing other controls or its input rules.
+static func style_action(button: Button, color: Color, text_color: Color = INK) -> void:
+	button.add_theme_stylebox_override("normal", box(color, 10, 16))
+	button.add_theme_stylebox_override("hover", box(color.lightened(0.12), 10, 16))
+	button.add_theme_stylebox_override("pressed", box(color.darkened(0.16), 10, 16))
+	button.add_theme_stylebox_override("disabled", box(color.darkened(0.45), 10, 16))
+	button.add_theme_stylebox_override("focus", box(Color.TRANSPARENT, 10, 16, Color("f6df9c"), 2))
+	button.add_theme_color_override("font_color", text_color)
+	button.add_theme_color_override("font_hover_color", text_color)
+	button.add_theme_color_override("font_pressed_color", text_color)
+	button.add_theme_color_override("font_focus_color", text_color)
+	button.add_theme_color_override("font_disabled_color", Color("b0b7ba"))
