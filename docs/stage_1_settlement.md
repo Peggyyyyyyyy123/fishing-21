@@ -11,7 +11,7 @@ var day := session.get_current_day()
 day.return_to_shore() # 主动结束；自动结束时无需调用
 var result := session.settle_day()
 if result != null:
-    print(result.get_income(), result.get_quota(), result.get_net_income())
+	print(result.get_income(), result.get_quota(), result.get_net_income())
 ```
 
 抛竿自动结束后，展示/控制层同样调用 settle_day()。此步尚无界面，未用动画回调触发结算。游戏核心仍与场景树分离。
