@@ -17,10 +17,10 @@
 
 Shares stock the daily 12-fish sea. Actual next-cast probabilities depend on remaining counts. Each species rolls uniformly over its inclusive integer weight range. The total discovery budget is 98 gold.
 
-## Settlement and persistence
+## Settlement and catalogue
 
 `income = sale_value * (2 if weight == 21 else 1) + daily_discovery_rewards`.
-On a bust, fish-sale value is replaced by zero; discovery rewards remain. Daily rewards reset each morning. Discovery identity does not reset when restarting a voyage. The catalogue is registered and saved when the catch is drawn, before choosing keep or release. It is not a save of the active voyage.
+On a bust, fish-sale value is replaced by zero; discovery rewards remain. Daily rewards reset each morning. The catalogue records a catch when it is drawn, before choosing keep or release. **Changed after `stage-3`:** the catalogue belongs to one voyage and is emptied when a new voyage starts; it is no longer saved to disk. This matches the calibration below, which already simulated every voyage as a new save.
 
 The catch card must be resolved before another cast, return, or settlement. Last-bait release ends the day; last-bait retention includes that fish. Releasing spends the bait but no slot/weight. Caught fish never return to the pool. Keeping an overweight catch remains possible with an explicit warning and release focused by default.
 
@@ -48,7 +48,7 @@ For a completely discovered catalogue, the independent-draw optimal Day 3 baseli
 
 ## Validation
 
-Ten Godot test suites (1,535 checks) cover configuration, lifecycle, casting, settlement, progression, production UI signals, sea counts, catch decisions and catalogue persistence. `LegacyTestConfig` provides the Stage 1 fish and rents, and `KeepEveryCatch` replays Stage 1 forced retention, so earlier assertions still run; test_foundation and test_choices validate the current production configuration. UI tests use isolated `res://tests/` catalogue files and do not touch the player's catalogue.
+Ten Godot test suites (1,535 checks) cover configuration, lifecycle, casting, settlement, progression, production UI signals, sea counts, catch decisions and the per-voyage catalogue. `LegacyTestConfig` provides the Stage 1 fish and rents, and `KeepEveryCatch` replays Stage 1 forced retention, so earlier assertions still run; test_foundation and test_choices validate the current production configuration. UI tests use isolated `res://tests/` catalogue files and do not touch the player's catalogue.
 
 ## Interface revision
 

@@ -17,7 +17,7 @@ Group: **Group5**.
 | --- | --- | --- |
 | Stage 1 | [`stage-1`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-1) | Complete seven-day game: casting, forced retention, 21 kg rule, settlement, rent, failure, victory, restart. See [the freeze record](docs/stage_1_release.md) |
 | Stage 2 | [`stage-2`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-2) | Finite visible daily sea, sea report, next-cast odds, rent in kilograms. See [Stage 2 rationale](docs/design_rationale_stage_2.md) |
-| Stage 3 | [`stage-3`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-3) | Ten species with prices and rarity, keep or release, discovery rewards, persistent field guide, rents 180–300, full-screen interface. See [Stage 3 rationale](docs/design_rationale_stage_3.md) |
+| Stage 3 | [`stage-3`](https://github.com/Peggyyyyyyyy123/fishing-21/tree/stage-3) | Ten species with prices and rarity, keep or release, discovery rewards, field guide, rents 180–300, full-screen interface. See [Stage 3 rationale](docs/design_rationale_stage_3.md) |
 
 Each tag is independently runnable. Earlier tags are never moved.
 
@@ -76,7 +76,7 @@ For a fresh test-only import without the editor window, use `--headless --editor
 | Today's Sea | Hover or focus to see the sea report. |
 | Field Guide | Open the collection from the menu, the game or the result screen. Esc closes it. |
 | Continue · Next day | After a passing non-final day, start the next day with a fresh net and bait. |
-| Start a new voyage | From the result screen, reset the run to Day 1 with zero savings. The field guide is kept. |
+| Start a new voyage | From the result screen, reset the run to Day 1 with zero savings. The field guide starts empty again. |
 | F11 / Esc | Toggle fullscreen / leave fullscreen. The game starts fullscreen. |
 
 Use the mouse for the primary interaction. The game requires no movement controls.
@@ -133,7 +133,7 @@ All Stage 1 rules above still apply. Stage 2 adds information, not new ways to e
 - **Ten species** replace the five size classes, each with its own rarity, weight range, price per kg and first-discovery reward ([table](docs/catch_choices.md#fish-configuration)). Every cast catches a fish.
 - After each catch a card shows the fish's weight, rarity and sale value. **Keep** puts it in the net; **Release** lets it go. Either way the bait is spent and the fish leaves today's sea.
 - Daily income = sale value of the net (species price × kg), **×2 at exactly 21 kg**, plus **discovery rewards** for species caught for the first time. On a bust the sale value is lost but discovery rewards are kept. Discovery rewards are never doubled.
-- The **field guide** records every species caught (kept or released), its catch count and biggest weight. It is saved locally and survives new voyages, so each discovery reward is paid once per save.
+- The **field guide** records every species caught in the current voyage (kept or released), its catch count and biggest weight. Starting a new voyage empties it, so discovery rewards are available again in every voyage. It is not saved to disk. (Changed after `stage-3`; see [post-Stage 3 fixes](docs/post_stage_3_fixes.md).)
 - **Daily rents: 180, 210, 240, 250, 260, 280, 300 gold.**
 - The sea report opens on hover over *Today's Sea*. The next-cast percentages from Stage 2 are no longer shown.
 
@@ -142,7 +142,6 @@ All Stage 1 rules above still apply. Stage 2 adds information, not new ways to e
 ```text
 config/         GameConfig and FishDefinition resources
 domain/         Catch generation, sea pool, odds, net, day, catalogue, settlement and run rules
-persistence/    FishCatalogStore: saves the field guide
 presentation/   GameController, GameView and its components (SeaReportPanel, CatchCard,
                 FieldGuideBook, FishArt, UiKit), FishingView
 scenes/         Main scene and interface scene
@@ -161,12 +160,13 @@ Design documents:
 | Stage 1 | [class_map_stage_1](docs/class_map_stage_1.md) | [design_rationale_stage_1](docs/design_rationale_stage_1.md) | — |
 | Stage 2 | [class_map_stage_2](docs/class_map_stage_2.md) | [design_rationale_stage_2](docs/design_rationale_stage_2.md) | [Stage 1 → 2](docs/change_map_stage_1_to_2.md) |
 | Stage 3 | [class_map_stage_3](docs/class_map_stage_3.md) | [design_rationale_stage_3](docs/design_rationale_stage_3.md) | [Stage 2 → 3](docs/change_map_stage_2_to_3.md) |
+| After Stage 3 | [final class map](docs/post_stage_3_fixes.md#final-class-map) | [post-Stage 3 fixes](docs/post_stage_3_fixes.md) | Stage 3 → current `main` |
 
 `GameSession` owns progression, coin payment and the `FishCatalog`. `FishingDay` owns casting, bait, the catch waiting for keep/release, today's discoveries and the daily end conditions. `FishingNet` stores catches. `SettlementRules` owns every money rule (species price, perfect multiplier, bust income, discovery rewards) and calculates a `DayResult` or a preview without paying coins itself. State guards prevent duplicate settlements and skipped days.
 
 `FishingDay` receives the small abstract `CatchSource` contract. `SeaPoolCatchSource` supplies normal gameplay (a finite daily sea). `RandomCatchSource` supplies independent draws when `sea_pool_size` is 0, and test-only `FixedCatchSource` supplies reproducible outcomes. `CatchForecast` computes next-cast odds from public information; since Stage 3 it is used by the balance tool, not the interface. Fish species differ through `FishDefinition` data rather than subclasses without different behaviour.
 
-`GameController` connects input to the model and saves the catalogue through `FishCatalogStore`. `GameView` displays state and results and composes `SeaReportPanel`, `CatchCard` and `FieldGuideBook`. `FishingView` draws the scenery. Domain code has no dependency on scene nodes or buttons, although it uses Godot types such as `RefCounted` and `Resource`.
+`GameController` connects input to the model. `GameView` displays state and results and composes `SeaReportPanel`, `CatchCard` and `FieldGuideBook`. `FishingView` draws the scenery. Domain code has no dependency on scene nodes or buttons, although it uses Godot types such as `RefCounted` and `Resource`.
 
 ## Verification
 
@@ -187,7 +187,7 @@ foreach ($suite in $testSuites) {
 }
 ```
 
-Recorded results for Stage 3. The Stage 1 suites keep their assertions: they replay Stage 1 forced retention with the `KeepEveryCatch` test player and use `LegacyTestConfig` for Stage 1 fish and rents. Only foundation and initialization check the new production values.
+Recorded results for the current `main` (Stage 3 plus the [post-Stage 3 fixes](docs/post_stage_3_fixes.md)). The Stage 1 suites keep their assertions: they replay Stage 1 forced retention with the `KeepEveryCatch` test player and use `LegacyTestConfig` for Stage 1 fish and rents. Only foundation and initialization check the new production values.
 
 | Suite | Checks | Failures |
 | --- | ---: | ---: |
@@ -199,11 +199,11 @@ Recorded results for Stage 3. The Stage 1 suites keep their assertions: they rep
 | UI | 79 | 0 |
 | Review regressions | 12 | 0 |
 | Sea report (Stage 2) | 41 | 0 |
-| Catch choices and catalogue (Stage 3) | 672 | 0 |
-| Interface (Stage 3) | 124 | 0 |
+| Catch choices and catalogue (Stage 3) | 670 | 0 |
+| Interface (Stage 3) | 126 | 0 |
 | **Total** | **1535** | **0** |
 
-These results cover the recorded source version and do not guarantee untested changes or environments. Tests include probability boundaries, 21/22 kg limits, keep/release, discovery rewards, catalogue persistence and migration, ending priority, repeated input, settlement idempotence, all seven days, failure with savings and restart. UI tests use separate catalogue files under `res://tests/` and never touch the player's save.
+These results cover the recorded source version and do not guarantee untested changes or environments. Tests include probability boundaries, 21/22 kg limits, keep/release, discovery rewards, per-voyage catalogue reset, ending priority, repeated input, settlement idempotence, all seven days, failure with savings and restart.
 
 `test_ui.gd` instantiates the production scene, uses a fixed catch source, and triggers actual button-signal connections to reproduce victory, bust and restart. It runs headlessly and does not replace mouse/keyboard or visual checks. `test_progression.gd` includes a mixed seven-day scenario with expected final savings of **520 gold** (Stage 1 economy).
 
@@ -211,7 +211,7 @@ See [the acceptance checklist](docs/stage_1_acceptance.md) for observed manual S
 
 ## Known limitations
 
-- Basic native 2D scenery and casting animation, with no audio. Only the field guide is saved; a voyage in progress is not.
+- Basic native 2D scenery and casting animation, with no audio and no save/load.
 - With ten species, the hover sea report is tall and can overlap the header on short screens.
 - The modelled seven-day victory rate under the Stage 3 rents is low (under 1% for the calibration policy, which ignores discovery rewards). Playtests are still needed.
 - Shops and upgrades are not implemented.

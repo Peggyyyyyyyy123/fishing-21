@@ -1,6 +1,6 @@
 class_name GameSession
 extends RefCounted
-## Owns run lifecycle, day number, coins and the fish catalogue. No scene-tree dependencies.
+## Owns run lifecycle, day number, coins and the voyage's fish catalogue. No scene-tree dependencies.
 
 enum State { NOT_STARTED, READY_FOR_DAY, DAY_ACTIVE, DAY_ENDED, DAY_SETTLED, GAME_OVER, VICTORY }
 
@@ -12,7 +12,7 @@ var _day_number: int = 0
 var _coins: int = 0
 var _current_day: FishingDay
 var _start_errors := PackedStringArray()
-var _catalog := FishCatalog.new()  # Survives restarts: discoveries belong to the player, not one voyage.
+var _catalog := FishCatalog.new()  # One field guide per voyage; a new voyage starts empty.
 
 
 func start_new_game(config: GameConfig) -> bool:
@@ -36,6 +36,7 @@ func start_new_game(config: GameConfig) -> bool:
 	_last_result = null
 	_day_number = 1
 	_coins = 0
+	_catalog = FishCatalog.new()
 	_current_day = null
 	_state = State.READY_FOR_DAY
 	return true
@@ -92,12 +93,7 @@ func get_current_day() -> FishingDay:
 	return _current_day
 
 
-## Replaces the catalogue, e.g. after loading a save. The session keeps its own copy.
-func set_catalog(catalog: FishCatalog) -> void:
-	_catalog = FishCatalog.new() if catalog == null else catalog.copy()
-
-
-## Read-only snapshot for display and saving.
+## Read-only snapshot for display.
 func get_catalog() -> FishCatalog:
 	return _catalog.copy()
 

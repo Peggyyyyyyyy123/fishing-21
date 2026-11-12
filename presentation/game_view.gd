@@ -51,7 +51,7 @@ func show_menu(config: GameConfig) -> void:
 	_config = config
 	%StartButton.text = "Start your %d-day voyage" % config.get_total_days()
 	%StartButton.disabled = false
-	%MenuRules.text = "%d bait per day. A net with %d slots and a %d kg limit.\nEvery cast catches a fish. Keep it or release it.\nExactly %d kg doubles fish-sale income.\nDiscover new species for a one-time gold reward.\nCover the daily rent for %d days to win." % [config.bait_per_day, config.net_slots, config.weight_cap_kg, config.weight_cap_kg, config.get_total_days()]
+	%MenuRules.text = "%d bait per day. A net with %d slots and a %d kg limit.\nEvery cast catches a fish. Keep it or release it.\nExactly %d kg doubles fish-sale income.\nDiscover new species for a gold reward, once per voyage.\nCover the daily rent for %d days to win." % [config.bait_per_day, config.net_slots, config.weight_cap_kg, config.weight_cap_kg, config.get_total_days()]
 	if config.sea_pool_size > 0:
 		%MenuRules.text += "\nHover Today's Sea for the sea report: %d fish at dawn." % config.sea_pool_size
 	_menu.show()
@@ -71,7 +71,7 @@ func render(session: GameSession, config: GameConfig, busy: bool) -> void:
 	_session = session
 	_config = config
 	var earned := session.preview_income()
-	%DayLabel.text = "Day %d" % session.get_day_number()
+	%DayLabel.text = "Day %d / %d" % [session.get_day_number(), session.get_total_days()]
 	%QuotaLabel.text = "Earned: %d gold" % earned
 	_cast_button.text = "Cast · Bait %d / %d" % [day.get_bait_remaining(), config.bait_per_day]
 	_return_button.text = "Return · Pay %d gold" % day.get_quota()
@@ -108,7 +108,7 @@ func describe_catch(result: CastResult, config: GameConfig) -> void:
 			set_message("Could not read catch data. No bait spent; please try again.")
 
 
-func show_catch_choice(session: GameSession, config: GameConfig, save_failed: bool = false) -> void:
+func show_catch_choice(session: GameSession, config: GameConfig) -> void:
 	var day := session.get_current_day()
 	var fish := day.get_pending_fish()
 	if fish == null:
@@ -125,8 +125,6 @@ func show_catch_choice(session: GameSession, config: GameConfig, save_failed: bo
 		day.was_last_catch_discovered(),
 		overweight,
 	)
-	if save_failed:
-		set_message("Field guide could not be saved. Check disk access.")
 
 
 func hide_catch_choice() -> void:

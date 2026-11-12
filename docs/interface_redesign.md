@@ -7,7 +7,7 @@
 - Catch: a blue pixel-style card with a pale border, weight corner, native pixel fish illustration, English name, rarity, gold sale price and optional NEW DISCOVERY badge. The price is the fish's sale value, excluding the discovery reward and perfect multiplier. Keep and Release retain the existing rule behavior. Overweight is identified on the Keep button, with Release focused by default.
 - Field guide: parchment two-page book. Select a collected species in the right grid to see its illustration, rarity, biggest weight in grams, catch count and economics on the left. Unknown species appear as silhouettes. All 10 slots fit; scrolling remains available for future expansion.
 - All runtime interface strings, names and rarities are English. Pixel fish are code-native assets shared between cards and the collection, without external image dependencies.
-- Catalogue schema version 2 stores count, best_weight_kg and last_weight_kg per species in the existing file. Legacy boolean unlocks stay unlocked and do not pay a second discovery bonus. Historical weights/counts are not invented; the guide shows Not recorded until the next catch.
+- Catalogue schema version 2 stores count, best_weight_kg and last_weight_kg per species in the existing file. Legacy boolean unlocks stay unlocked and do not pay a second discovery bonus. Historical weights/counts are not invented; the guide shows Not recorded until the next catch. *(Superseded after `stage-3`: the catalogue now resets each voyage and is not saved; see [post-Stage 3 fixes](post_stage_3_fixes.md).)*
 
 ## Verification
 

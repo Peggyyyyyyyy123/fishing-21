@@ -12,7 +12,6 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_controller = load("res://scenes/main.tscn").instantiate() as GameController
-	_controller.catalog_store = FishCatalogStore.new("res://tests/.ui_catalog.cfg")
 	_controller.cast_delay_seconds = 0.001
 	_controller.catch_source_factory = func() -> CatchSource: return FixedCatchSource.new([Fish.new(&"huge", 21)])
 	root.add_child(_controller)
@@ -62,7 +61,6 @@ func _run() -> void:
 	_check(session.get_state() == GameSession.State.GAME_OVER and session.get_last_result().get_income() == 0, "Empty return fails through UI")
 	_controller.queue_free()
 	await process_frame
-	DirAccess.remove_absolute(ProjectSettings.globalize_path("res://tests/.ui_catalog.cfg"))
 	print("UI: %d checks, %d failures" % [_checks, _failures])
 	quit(0 if _failures == 0 else 1)
 

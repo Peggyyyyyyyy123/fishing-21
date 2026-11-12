@@ -2,7 +2,6 @@ extends SceneTree
 
 var checks := 0
 var failures := 0
-const SAVE := "res://tests/.catalog_test.cfg"
 
 func _initialize() -> void:
 	run.call_deferred()
@@ -71,10 +70,12 @@ func run() -> void:
 	var result := session.settle_day()
 	check(result.get_income() == 76 and result.get_discovery_income() == 12, "Species sale plus discovery")
 	check(session.settle_day().get_income() == 76 and session.get_coins() == 0, "Settlement idempotent, no savings cover")
+	check(session.get_catalog().is_discovered(&"gold_butterflyfish"), "Discovery kept for the rest of the voyage")
 	check(session.start_new_game(c), "Restart accepted")
+	check(session.get_catalog().get_discovered_count() == 0, "New voyage starts with an empty field guide")
 	session.start_day(FixedCatchSource.new([Fish.new(&"gold_butterflyfish", 3)]))
 	session.get_current_day().cast()
-	check(not session.get_current_day().was_last_catch_discovered(), "Restart does not reset discovery")
+	check(session.get_current_day().was_last_catch_discovered() and session.preview_income() == 12, "New voyage pays the discovery reward again")
 
 	session = fresh([Fish.new(&"golden_tuna", 21)], 1)
 	day = session.get_current_day()
@@ -120,21 +121,8 @@ func run() -> void:
 	day.resolve_catch(false)
 	check(day.return_to_shore() and not day.resolve_catch(true), "Resolution after return rejected")
 
-	var store := FishCatalogStore.new(SAVE)
-	var saved_catalog := FishCatalog.new()
-	saved_catalog.record_catch(Fish.new(&"sardine", 2))
-	saved_catalog.record_catch(Fish.new(&"golden_tuna", 19))
-	check(store.save_catalog(saved_catalog) == OK, "Catalogue saves")
-	check(FishCatalogStore.new(SAVE).load_catalog().to_dictionary() == saved_catalog.to_dictionary(), "New process-equivalent store reloads")
-	var smaller := FishCatalog.new()
-	smaller.record_catch(Fish.new(&"sardine", 1))
-	check(store.save_catalog(smaller) == OK, "Atomic replacement of existing file")
-	check(FishCatalogStore.new(SAVE).load_catalog().get_discovered_count() == 1, "Replacement persisted")
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE))
-
-	# Production scene and real signal wiring; use an isolated save, never the player's.
+	# Production scene and real signal wiring.
 	var controller := load("res://scenes/main.tscn").instantiate() as GameController
-	controller.catalog_store = FishCatalogStore.new(SAVE)
 	controller.cast_delay_seconds = 0.01
 	controller.catch_source_factory = func() -> CatchSource: return FixedCatchSource.new([Fish.new(&"golden_tuna", 21)])
 	root.add_child(controller)
@@ -151,9 +139,8 @@ func run() -> void:
 	controller._on_return()
 	check(controller.get_session().get_last_result().get_income() == 870, "Production controller settles species value")
 	view.open_field_guide()
-	check(view.get_node("%FieldGuide").visible and view.get_node("%CatalogDetails").text.contains("Collected 1 / 10"), "Catalogue displays saved progress")
+	check(view.get_node("%FieldGuide").visible and view.get_node("%CatalogDetails").text.contains("Collected 1 / 10"), "Field guide shows this voyage's discoveries")
 	controller.queue_free()
 	await process_frame
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE))
 	print("Choices: %d checks, %d failures" % [checks, failures])
 	quit(0 if failures == 0 else 1)

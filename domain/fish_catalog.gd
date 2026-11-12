@@ -1,36 +1,15 @@
 class_name FishCatalog
 extends RefCounted
-## The player's collection across voyages: which species were discovered and their catch records.
-## Knows nothing about gold; SettlementRules prices discoveries. Persistence is in FishCatalogStore.
-
-const SCHEMA_VERSION := 2
+## The voyage's field guide: which species were discovered and their catch records.
+## Knows nothing about gold; SettlementRules prices discoveries. A new voyage starts a new catalogue.
 
 var _records: Dictionary = {}  # String species id -> {count, best_weight_kg, last_weight_kg}
 
 
-## Builds a catalogue from saved data. Version 1 saves stored `true` per species:
-## those stay discovered with no invented counts or weights.
-static func from_dictionary(data: Dictionary) -> FishCatalog:
-	var catalog := FishCatalog.new()
-	for key in data:
-		var value: Variant = data[key]
-		var record := {"count": 0, "best_weight_kg": 0, "last_weight_kg": 0}
-		if value is Dictionary:
-			record["count"] = maxi(int(value.get("count", 0)), 0)
-			record["best_weight_kg"] = maxi(int(value.get("best_weight_kg", 0)), 0)
-			record["last_weight_kg"] = maxi(int(value.get("last_weight_kg", 0)), 0)
-		elif value != true:
-			continue
-		catalog._records[String(key)] = record
-	return catalog
-
-
-func to_dictionary() -> Dictionary:
-	return _records.duplicate(true)
-
-
 func copy() -> FishCatalog:
-	return FishCatalog.from_dictionary(to_dictionary())
+	var catalog := FishCatalog.new()
+	catalog._records = _records.duplicate(true)
+	return catalog
 
 
 ## Records a caught fish (kept or released). Returns true on the first discovery of its species.
@@ -55,11 +34,11 @@ func get_discovered_count() -> int:
 	return _records.size()
 
 
-## 0 when the species is undiscovered or was discovered before counts were recorded.
+## 0 when the species is undiscovered.
 func get_catch_count(species_id: StringName) -> int:
 	return int(_records.get(String(species_id), {}).get("count", 0))
 
 
-## 0 when not recorded.
+## 0 when the species is undiscovered.
 func get_best_weight_kg(species_id: StringName) -> int:
 	return int(_records.get(String(species_id), {}).get("best_weight_kg", 0))

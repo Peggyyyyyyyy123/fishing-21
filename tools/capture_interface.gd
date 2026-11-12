@@ -1,5 +1,4 @@
 extends SceneTree
-const SAVE := "res://tools/.ui_preview.cfg"
 var destination: String
 
 func _initialize() -> void:
@@ -18,10 +17,7 @@ func run() -> void:
 		await process_frame
 		await process_frame
 	print("Capture window: ", root.size, " mode: ", root.mode)
-	var store := FishCatalogStore.new(SAVE)
-	store.save_raw({"sardine": {"count": 8, "best_weight_kg": 3}, "mackerel": {"count": 4, "best_weight_kg": 4}, "red_seabream": {"count": 2, "best_weight_kg": 11}, "moon_angelfish": {"count": 1, "best_weight_kg": 8}}, 2)
 	var controller := load("res://scenes/main.tscn").instantiate() as GameController
-	controller.catalog_store = store
 	controller.cast_delay_seconds = 0.01
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 18
@@ -35,17 +31,15 @@ func run() -> void:
 	(view.get_node("%SeaPanel") as SeaReportPanel).reveal()
 	await snap("redesign_sea")
 	(view.get_node("%SeaPanel") as SeaReportPanel).hide()
-	view.open_field_guide()
-	(view.get_node("%FieldGuide") as FieldGuideBook).select(&"moon_angelfish")
-	await snap("redesign_book")
-	(view.get_node("%FieldGuide") as FieldGuideBook).close()
 	(view.get_node("%CastButton") as Button).pressed.emit()
 	await create_timer(0.1).timeout
 	await snap("redesign_card")
 	(view.get_node("%ReleaseButton") as Button).pressed.emit()
+	view.open_field_guide()
+	await snap("redesign_book")
+	(view.get_node("%FieldGuide") as FieldGuideBook).close()
 	(view.get_node("%ReturnButton") as Button).pressed.emit()
 	await snap("redesign_result")
 	controller.queue_free()
 	await process_frame
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE))
 	quit()
