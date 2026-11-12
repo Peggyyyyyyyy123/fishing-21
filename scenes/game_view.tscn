@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://presentation/game_view.gd" id="1"]
 [ext_resource type="Script" path="res://presentation/fishing_view.gd" id="2"]
+[ext_resource type="Script" path="res://presentation/sea_report_panel.gd" id="3"]
 
 [node name="GameView" type="Control"]
 layout_mode = 1
@@ -82,11 +83,45 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Bait  —"
 
-[node name="SeaSpace" type="Control" parent="Margin/Layout"]
+[node name="SeaSpace" type="HBoxContainer" parent="Margin/Layout"]
 layout_mode = 2
 size_flags_vertical = 3
 custom_minimum_size = Vector2(0, 120)
 mouse_filter = 2
+
+[node name="Scenery" type="Control" parent="Margin/Layout/SeaSpace"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="SeaPanel" type="PanelContainer" parent="Margin/Layout/SeaSpace"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+custom_minimum_size = Vector2(420, 0)
+mouse_filter = 2
+script = ExtResource("3")
+
+[node name="Layout" type="VBoxContainer" parent="Margin/Layout/SeaSpace/SeaPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SeaTitle" type="Label" parent="Margin/Layout/SeaSpace/SeaPanel/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Today's sea"
+
+[node name="SeaGrid" type="GridContainer" parent="Margin/Layout/SeaSpace/SeaPanel/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 4
+columns = 3
+
+[node name="ForecastLabel" type="Label" parent="Margin/Layout/SeaSpace/SeaPanel/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Next cast  —"
 
 [node name="CatchMessage" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true

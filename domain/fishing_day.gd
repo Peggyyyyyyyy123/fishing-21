@@ -56,6 +56,18 @@ func get_fish() -> Array[Fish]:
 	return _net.get_fish()
 
 
+func get_next_cast_chances() -> Dictionary:
+	return {} if _catch_source == null else _catch_source.get_next_draw_chances()
+
+
+func get_sea_initial_counts() -> Dictionary:
+	return {} if _catch_source == null else _catch_source.get_initial_counts()
+
+
+func get_sea_remaining_counts() -> Dictionary:
+	return {} if _catch_source == null else _catch_source.get_remaining_counts()
+
+
 func can_cast() -> bool:
 	return (
 		_catch_source != null

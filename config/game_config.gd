@@ -8,6 +8,8 @@ extends Resource
 @export var price_per_kg: int = 10
 @export var perfect_multiplier: int = 2
 @export var bust_income: int = 0
+## Outcomes stocked in each day's visible sea, drawn without replacement. 0 = independent draws.
+@export var sea_pool_size: int = 12
 @export var daily_quotas: Array[int] = [40, 50, 60, 70, 80, 90, 100]
 @export var fish_definitions: Array[FishDefinition] = []
 
@@ -23,6 +25,8 @@ func validate() -> PackedStringArray:
 		errors.append("Net capacity, bait and weight limit must be positive.")
 	if price_per_kg < 1 or perfect_multiplier < 1 or bust_income < 0:
 		errors.append("Price and multiplier must be positive; bust income cannot be negative.")
+	if sea_pool_size < 0 or (sea_pool_size > 0 and sea_pool_size < bait_per_day):
+		errors.append("Sea pool size must be 0 (independent draws) or at least the daily bait.")
 	if daily_quotas.is_empty():
 		errors.append("At least one daily quota is required.")
 	for quota in daily_quotas:

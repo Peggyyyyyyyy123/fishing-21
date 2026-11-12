@@ -45,7 +45,7 @@ func start_day(catch_source: CatchSource = null) -> bool:
 		return false
 	var source := catch_source
 	if source == null:
-		source = RandomCatchSource.new(_config)
+		source = _create_default_source()
 	_current_day = FishingDay.new(
 		_day_number,
 		_config.daily_quotas[_day_number - 1],
@@ -56,6 +56,14 @@ func start_day(catch_source: CatchSource = null) -> bool:
 	)
 	_state = State.DAY_ACTIVE
 	return true
+
+
+func _create_default_source() -> CatchSource:
+	# The only place that chooses a concrete source; FishingDay and settlement depend on CatchSource.
+	# Tests and demonstrations bypass this by passing their own source to start_day().
+	if _config.sea_pool_size > 0:
+		return SeaPoolCatchSource.new(_config)
+	return RandomCatchSource.new(_config)
 
 
 func get_state() -> State:
@@ -79,6 +87,18 @@ func get_total_days() -> int:
 
 func get_current_day() -> FishingDay:
 	return _current_day
+
+
+## Odds of the next cast during an active day; null when unknown or no cast is pending.
+func get_next_cast_forecast() -> CatchForecast:
+	if get_state() != State.DAY_ACTIVE or not _current_day.can_cast():
+		return null
+	return CatchForecast.calculate(
+		_config.fish_definitions,
+		_current_day.get_next_cast_chances(),
+		_current_day.get_total_weight_kg(),
+		_config.weight_cap_kg,
+	)
 
 
 func get_start_errors() -> PackedStringArray:

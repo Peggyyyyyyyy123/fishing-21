@@ -30,6 +30,13 @@ func draw() -> Fish:
 	)
 
 
+func get_next_draw_chances() -> Dictionary:
+	var chances := {}
+	for definition in _definitions:
+		chances[definition.species_id] = maxf(definition.probability, 0.0) / _probability_sum
+	return chances
+
+
 func _pick_definition(roll: float) -> FishDefinition:
 	assert(roll >= 0.0 and roll < 1.0, "Roll must be in [0, 1).")
 	# Normalise sums within configuration tolerance to avoid an unassigned tail.

@@ -13,6 +13,7 @@ signal restart_requested
 @onready var _cast_button: Button = %CastButton
 @onready var _return_button: Button = %ReturnButton
 @onready var _scenery: FishingView = $FishingView
+@onready var _sea_report: SeaReportPanel = %SeaPanel
 
 
 func _ready() -> void:
@@ -31,6 +32,8 @@ func show_menu(config: GameConfig) -> void:
 	%StartButton.text = "Start your %d-day voyage" % config.get_total_days()
 	%StartButton.disabled = false
 	%MenuRules.text = "%d bait per day. Your net holds up to %d fish.\nOver %d kg breaks the net. Exactly %d kg pays ×%d.\nCover the daily rent for %d days to win.\nKeep every catch. Choose when to return to shore." % [config.bait_per_day, config.net_slots, config.weight_cap_kg, config.weight_cap_kg, config.perfect_multiplier, config.get_total_days()]
+	if config.sea_pool_size > 0:
+		%MenuRules.text += "\nEach morning the sea report shows today's %d catches.\nEvery cast takes one out — count what is left." % config.sea_pool_size
 	_menu.show()
 	_result.hide()
 
@@ -45,10 +48,13 @@ func render(session: GameSession, config: GameConfig, busy: bool) -> void:
 	if day == null:
 		return
 	%DayLabel.text = "Day %d / %d" % [session.get_day_number(), session.get_total_days()]
-	%QuotaLabel.text = "Daily rent  %d gold" % day.get_quota()
+	var rent_kg := _rent_weight_kg(day.get_quota(), config)
+	%QuotaLabel.text = "Daily rent  %d gold  (≥ %d kg)" % [day.get_quota(), rent_kg]
 	%CoinsLabel.text = "Savings  %d gold" % session.get_coins()
 	%BaitLabel.text = "Bait  %d / %d" % [day.get_bait_remaining(), config.bait_per_day]
 	%WeightLabel.text = "Net weight  %d / %d kg" % [day.get_total_weight_kg(), config.weight_cap_kg]
+	if day.get_total_weight_kg() >= rent_kg and day.get_total_weight_kg() <= config.weight_cap_kg:
+		%WeightLabel.text += "  ·  rent covered"
 	%WeightBar.max_value = config.weight_cap_kg
 	%WeightBar.value = day.get_total_weight_kg()
 	%NetCount.text = "%d / %d fish" % [day.get_fish_count(), config.net_slots]
@@ -70,6 +76,20 @@ func render(session: GameSession, config: GameConfig, busy: bool) -> void:
 	_cast_button.disabled = not active or not day.can_cast()
 	_return_button.disabled = not active
 	_scenery.set_casting(busy)
+	var forecast: CatchForecast = null if busy else session.get_next_cast_forecast()
+	_sea_report.render(day, config, forecast)
+	_tint_weight_bar(forecast)
+
+
+func _tint_weight_bar(forecast: CatchForecast) -> void:
+	var fill := StyleBoxFlat.new()
+	fill.set_corner_radius_all(5)
+	fill.bg_color = SeaReportPanel.risk_color(forecast)
+	%WeightBar.add_theme_stylebox_override("fill", fill)
+
+
+func _rent_weight_kg(quota: int, config: GameConfig) -> int:
+	return ceili(float(quota) / config.price_per_kg)
 
 
 func set_message(message: String) -> void:
